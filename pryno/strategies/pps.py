@@ -364,8 +364,8 @@ class PPS:
                                 # 	bitcoin price is {1} and for the server is {2}'.format(settings.CLIENT_NAME,self.actualPrice,datetime.datetime.now()))
                                 #Contract amount to get for each gradle order
                                 #0.215
-                                if(settings.MARGIN > 1):
-                                    self._contractStep = round(settings.MARGIN*settings.CONTRACT_PCT*self.actualPrice*tools.XBt_to_XBT(self.available_margin['availableMargin']))/settings.RISK_DIVISOR
+                                if(settings.ISOLATED_MARGIN_FACTOR > 1):
+                                    self._contractStep = round(settings.ISOLATED_MARGIN_FACTOR*settings.CONTRACT_PCT*self.actualPrice*tools.XBt_to_XBT(self.available_margin['availableMargin']))/settings.RISK_DIVISOR
                                 else:
                                     self._contractStep = round(settings.CONTRACT_PCT*self.actualPrice*tools.XBt_to_XBT(self.available_margin['availableMargin']))/settings.RISK_DIVISOR
                                 lastPrice = tools.toNearest(self.actualPrice, self.tickSize)
@@ -621,10 +621,10 @@ class PPS:
 
             if(settings.FIXED_MARGIN_FLAG):
                 if(self.leverage != None):
-                    if(self.leverage != settings.MARGIN):
-                        self.exchange.isolate_margin('XBTUSD',settings.MARGIN)
+                    if(self.leverage != settings.ISOLATED_MARGIN_FACTOR):
+                        self.exchange.isolate_margin('XBTUSD',settings.ISOLATED_MARGIN_FACTOR)
                     else:
-                        self.logger.info('Leverage setted to {0}'.format(settings.MARGIN))
+                        self.logger.info('Leverage setted to {0}'.format(settings.ISOLATED_MARGIN_FACTOR))
                 else:
                     self.logger.info('no leverage to be setted for now')
 

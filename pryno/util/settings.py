@@ -27,7 +27,7 @@ ORDER_INCREASE_INTERVAL = 7
 CONTRACT_PCT = 1.75/100
 #Activate Fixed Margin
 FIXED_MARGIN_FLAG = False
-MARGIN = 5
+ISOLATED_MARGIN_FACTOR = 5
 #Margin funds percentual to get for amount of contracts as steps increases, for dynamic contract steps 
 SMALL_CONTRACT = 0.215
 MEDIUM_CONTRACT = 0.2375
