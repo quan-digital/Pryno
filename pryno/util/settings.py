@@ -10,9 +10,35 @@ BASE_URL = "https://testnet.bitmex.com/api/v1/"
 # BASE_URL = "https://www.bitmex.com/api/v1/"
 
 # Bot email
-MAIL_NAME = 'Joe Mama'
 CLIENT_NAME = 'Cthulhu'
 STRATEGY_NAME = 'PPS'
+
+# Bitmex API Key Pairs
+
+# kaue@gmail : pryno : TESTNET
+BITMEX_KEY = "0aV6qmThEH680-8OKSlnx__J"
+BITMEX_SECRET = "2G74dk7eCLhEErpTmFq6TTOj8HX_NvRZ2hfOmunJ7U9fxCnx"
+
+# kaue@gmail : seila : TESTNET
+# BITMEX_KEY = "rolMDEfUQwwASTckmugBkeM5"
+# BITMEX_SECRET = "anR6vCI74u10ggGAxAlCVN05ITrtC8bwiK4_s86vtXRARddP"
+
+#DALLAS
+# bitmex_key = "kduY6LrC2NGcTKMalNgzgiHD"
+# bitmex_secret =  "RiEKMY2Xxuk4AGDjmXhQImxMpQ6FSHusyPgHaGwPOAMiE6gP"
+
+#MATT
+# bitmex_key = "gApIJjnEDjpx5cK9BiTYc22r"
+# bitmex_secret =  "LPQFjdUnf1bZZMi12YdUVQWlq_VfllDpwdSb-C1WWPFOsLxa"
+
+# kaue@elint : 211 : TESTNET
+# bitmex_key = "xN_wtdAuDF8H3EPjDE_VkqEW"
+# bitmex_secret = "0Q9fxMmz9cxgkLnHKYm00ZAFrqBaFYreqnMheASq8f9CgBKQ"
+
+# elintdata@gmail.com : bot1 : BITMEX
+# bitmex_key = "7JEjfUfpt7T9gMno8NSw86Ld"
+# bitmex_secret = "Qya14PDUSNc8w7gRG_XGrv_Gy0IczQeeKrumVxsPhF6JnFdr"
+
 
 #####################################################
 # Operation Parameters
@@ -129,7 +155,7 @@ SANITY_LIMIT = 2
 
 # In seconds
 AUTH_EXPIRE_TIME = 10
-
+API_TIMEOUT = 7
 
 # Retry wait time in seconds
 HTTP_RETRY_TIME = 8
@@ -160,9 +186,6 @@ ORDERBOOK = "orderBook10"
 # Constants & Misc
 #####################################################
 
-# Email receipients
-MAIL_TO_ERROR = ['kauecano@gmail.com', 'claudiocarvalhovilasboas@gmail.com']
-MAIL_ACTIVITY = ['kauecano@gmail.com', 'claudiocarvalhovilasboas@gmail.com','antoniodelimaesilva@gmail.com','alexandre.c.bandarra01@gmail.com']
 # Instrument to market make on BitMEX.
 SYMBOL = "XBTUSD"
 
@@ -193,40 +216,17 @@ _PAUSE_BOT = False
 # Project version from setuptools
 BOT_VERSION = str(pkg_resources.require("pryno")[0].version).replace(".","")
 
-
 #####################################################
-# Not used yet
+# Mail & Telegram
 #####################################################
 
-# How many pairs of buy/sell orders to keep open
-'NU'
-ORDER_PAIRS = 10
+BOT_MAIL = "pipryno@gmail.com"
+BOT_PWD = "SurubaoParaiso123"
+# Birth date 10/03/2000
 
-# Distance between successive orders, as a percentage (example: 0.005 for 0.5%)
-'NU'
-INTERVAL = 0.005
-
-# Minimum spread to maintain, in percent, between asks & bids
-'NU'
-MIN_SPREAD = 0.01
-
-# If True, market-maker will place orders just inside the existing spread and work the interval % outwards,
-# rather than starting in the middle and killing potentially profitable spreads.
-'NU'
-MAINTAIN_SPREADS = True
-
-# How often to re-check and replace orders.
-# Generally, it's safe to make this short because we're fetching from websockets. But if too many
-# order amend/replaces are done, you may hit a ratelimit. If so, email BitMEX if you feel you need a higher limit.
-'NU'
-LOOP_INTERVAL = 8
-
-# Wait times between orders / errors / single request timeout
-'NU'
-API_REST_INTERVAL = 1
-API_ERROR_INTERVAL = 10
-API_TIMEOUT = 7
-
+# Email receipients
+MAIL_TO_ERROR = ['kauecano@gmail.com', 'claudiocarvalhovilasboas@gmail.com']
+MAIL_ACTIVITY = ['kauecano@gmail.com', 'claudiocarvalhovilasboas@gmail.com','antoniodelimaesilva@gmail.com','alexandre.c.bandarra01@gmail.com']
 
 #Telegram Bots Token
 TOKEN_MAIN_BOT = "1199841211:AAHi1GPjTQJ0dkBTTXSm8zHcQEUzIwBThcs"

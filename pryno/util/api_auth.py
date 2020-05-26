@@ -1,10 +1,14 @@
+# -*- coding: utf-8 -*-
+
+# - Bitmex API Auth module -
+# * Quan.digital *
+
 import time, urllib, hmac, hashlib
 from requests.auth import AuthBase
 import pryno.util.settings as settings
 
 def generate_nonce():
     return int(round(time.time() + 3600))
-
 
 # Generates an API signature.
 # A signature is HMAC_SHA256(secret, verb + path + nonce + data), hex encoded.
@@ -50,7 +54,6 @@ def generate_signature2(secret, verb, url, nonce, data):
     signature = hmac.new(bytes(secret, 'utf8'), bytes(message, 'utf8'), digestmod=hashlib.sha256).hexdigest()
     return signature
 
-
 class APIKeyAuthWithExpires(AuthBase):
     """Attaches API Key Authentication to the given Request object. This implementation uses `expires`."""
 
@@ -71,5 +74,4 @@ class APIKeyAuthWithExpires(AuthBase):
         r.headers['api-expires'] = str(expires)
         r.headers['api-key'] = self.apiKey
         r.headers['api-signature'] = generate_signature2(self.apiSecret, r.method, r.url, expires, r.body or '')
-
         return r

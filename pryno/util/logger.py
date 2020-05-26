@@ -129,6 +129,7 @@ def log_exception(exc_type, exc_value, exc_traceback):
                                                     settings.CLIENT_NAME,str(datetime.now()),message))
 
     os.popen('killall python3')
+    # os.popen('sudo killall -9 python3') # force kill extreme
     # os.popen('python3 main.py')
     return
 # then set sys.excepthook = logger.log_exception on main file
@@ -140,7 +141,6 @@ def log_error(message):
     error_logger.error(message)
     error_logger.info('-----------------------------------------------------------------')
     error_logger.info('')
-    #telegram_bot.send_group_message(msg = str(datetime.now()) + " " + message)
     if 'Restarting...' not in message:
         telegram_bot.send_group_message(msg="🚨 Error ocurred for {0} at {1}, here's the traceback: {2}".format(
                                                     settings.CLIENT_NAME,str(datetime.now()),message))

@@ -24,12 +24,10 @@ import datetime as dt
 import base64
 import sys
 import uuid
-
 from pryno.util.api_auth import APIKeyAuthWithExpires
 import pryno.util.settings as settings
 import pryno.util.logger as logger
 from pryno.util import tools
-
 
 class BitMEX(object):
 
@@ -66,7 +64,9 @@ class BitMEX(object):
         self.exit()
 
     def exit(self):
-        print('Bye')
+        self.logger.info('Bitmex API closed.')
+        self.logger.removeHandler(self.logger.handlers[0])
+        print('Bitmex API closed.')
 
     #
     # Public methods
@@ -661,5 +661,4 @@ class BitMEX(object):
 
         # Reset retry counter on success
         self.retries = 0
-
         return response.json()

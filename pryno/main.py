@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 
-
 from time import sleep
 import sys
 import datetime as dt
 import os
-import pryno.util.settings as settings
-import pryno.util.logger as logger
-from pryno.strategies import pps
 from threading import Thread
+from pryno.util import settings
+from pryno.util import logger
+from pryno.strategies import pps
 from pryno.dashboard import app
 
 if __name__ =='__main__':

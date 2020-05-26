@@ -203,7 +203,7 @@ def update_metrics(n):
     statusData = load_status()
     orderList = [(str(order) + '\n') for order in statusData['open_orders']]
 
-    with open('operation.json', 'r') as r:
+    with open(settings.LOG_DIR + 'operation.json', 'r') as r:
         status = json.load(r)
         statusjson = status['operation']
         statusjson = 'Running' if statusjson else 'Paused'
@@ -289,12 +289,12 @@ def update_output(n_clicks, cancel_n_clicks_timestamp, submit_n_clicks_timestamp
     if n_clicks:
         if username in settings.ADMIN_USERS:
             if submit_n_clicks_timestamp > cancel_n_clicks_timestamp:
-                with open ('operation.json', 'w') as op:
+                with open (settings.LOG_DIR + 'operation.json', 'w') as op:
                     json.dump(dict(operation = True), op)
                 settings._PAUSE_BOT = False
                 return
             else:
-                with open ('operation.json', 'w') as op:
+                with open (settings.LOG_DIR + 'operation.json', 'w') as op:
                     json.dump(dict(operation = False), op)
                 settings._PAUSE_BOT = True
                 return

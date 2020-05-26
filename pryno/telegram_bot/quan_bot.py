@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+
+# - Telegram API Wrapper -
+# * Quan.digital *
+
 from telegram.ext import Updater, CommandHandler , PrefixHandler
 import telegram
 import json
@@ -62,5 +67,5 @@ def InitialiseBot():
 	dp.add_handler(CommandHandler("quanid",getName))
 	dp.add_handler(CommandHandler("unsub",unsub))
 
-     # Start the Bot
+	# Start the Bot
 	updater.start_polling()
