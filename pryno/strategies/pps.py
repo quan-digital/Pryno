@@ -42,7 +42,7 @@ class PPS:
         # Initialize exchange
         self.symbol = settings.SYMBOL
         self.exchange = BitMEX(base_url=bitmex_url, 
-            symbol=self.symbol , apiKey=settings.BITMEX_KEY, apiSecret=settings.BITMEX_KEY)
+            symbol=self.symbol , apiKey=settings.BITMEX_KEY, apiSecret=settings.BITMEX_SECRET)
 
         # Class parameters
         self.stopSet = 0

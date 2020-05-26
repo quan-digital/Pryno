@@ -6,8 +6,8 @@
 import pkg_resources  
 
 # API URL
-BASE_URL = "https://testnet.bitmex.com/api/v1/"
-# BASE_URL = "https://www.bitmex.com/api/v1/"
+# BASE_URL = "https://testnet.bitmex.com/api/v1/"
+BASE_URL = "https://www.bitmex.com/api/v1/"
 
 # Bot email
 CLIENT_NAME = 'Cthulhu'
@@ -16,8 +16,8 @@ STRATEGY_NAME = 'PPS'
 # Bitmex API Key Pairs
 
 # kaue@gmail : pryno : TESTNET
-BITMEX_KEY = "0aV6qmThEH680-8OKSlnx__J"
-BITMEX_SECRET = "2G74dk7eCLhEErpTmFq6TTOj8HX_NvRZ2hfOmunJ7U9fxCnx"
+BITMEX_KEY = "iF2-k82rs_uWKN1Y29xUnNlY"
+BITMEX_SECRET = "Hqj3lyCVRfAiXNbXKB34LNL-PU_vek2vjsaYJ76CxGPL-I2i"
 
 # kaue@gmail : seila : TESTNET
 # BITMEX_KEY = "rolMDEfUQwwASTckmugBkeM5"
