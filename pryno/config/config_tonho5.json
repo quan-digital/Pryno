@@ -1,6 +1,7 @@
 {
     "CLIENT_NAME" : "Client",
     "CLIENT_PWD" : "pass",
-    "BITMEX_KEY" : "12345678901234567890",
-    "BITMEX_SECRET" : "12345678901234567890"
+    "BITMEX_KEY" : "1234567890abcabc",
+    "BITMEX_SECRET" : "1234567890abcdefghijkkk",
+    "FIXED_STEP" : 30
 }

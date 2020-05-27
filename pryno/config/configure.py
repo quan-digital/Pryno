@@ -1,23 +1,34 @@
+# -*- coding: utf-8 -*-
 
+# - Configure -
+# * Quan.digital *
+
+# Creates settings.py in the correct directory given config.json
+
+import shutil
 import json
-from pryno.config import settings_base
-with open('config.json', 'r') as r:
-    configs = json.load(r)
 
-with open('../util/settings.py', 'w') as w:
-    for item in dir(settings_base):
-        if not item.startswith('__') and not item.startswith('key') and not item.startswith('pkg_resources'):
-            w.write(item)
+if __name__ == '__main__':
+
+    # Copy base to correct file
+    shutil.copy2('./settings_base.py', '../util/settings.py')
+
+    # Load new configs
+    with open('config.json', 'r') as r:
+        configs = json.load(r)
+
+    # Write new configs
+    with open('../util/settings.py', 'a') as w:
+        for key, value in configs.items():
+            w.write(key)
             w.write(' = ')
+            # If number is either int or float, write it plainly
             try:
-                floattime = float(item)
-                w.write(settings_base.__dict__[item])
+                floatest = float(value)
+                w.write(str(value))
+            # Otherwise, sandwich with quotation marks so they end up as strings
             except:
-                w.write(str(str(settings_base.__dict__[item])))
+                w.write('"')
+                w.write(value)
+                w.write('"')
             w.write('\n\n')
-    for key, value in configs.items():
-        w.write(key)
-        w.write(' = ')
-        w.write(value)
-        w.write('\n\n')
-

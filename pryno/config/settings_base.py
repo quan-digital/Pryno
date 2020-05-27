@@ -188,3 +188,8 @@ MAIL_ACTIVITY = ['kauecano@gmail.com', 'claudiocarvalhovilasboas@gmail.com','ant
 TOKEN_MAIN_BOT = "1199841211:AAHi1GPjTQJ0dkBTTXSm8zHcQEUzIwBThcs"
 DEBUGGER_BOT = "1242980549:AAHuWBWEo33pViTpHxMeeN97gCs5V7YHDlA"
 DEBUGGER_BOT_GROUP = -459197842
+
+#####################################################
+# Instance Parameters
+#####################################################
+
