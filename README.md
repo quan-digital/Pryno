@@ -1,4 +1,4 @@
-# Quan Digital's Pryno
+# Quan Digital's Penis
 The ultimate crypto bot dev package - Trading Infrastructure + Dashboard + Telegram Bot 🦏🔥🚀
 
 <img src="img/cover.jpg" align="center" />
