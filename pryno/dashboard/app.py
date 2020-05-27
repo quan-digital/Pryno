@@ -339,6 +339,12 @@ def check_button_user(n):
         bn = 'In development'
     return [bn]
 
+# -----------------------------------------------------------------------------------------
+# ----------------------- Server Functions ------------------------------------------------
+# -----------------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------------------
+
+
 def run_server():
     print("Dashboard app server started running.")
     pid = os.getpid()
@@ -346,10 +352,16 @@ def run_server():
         w.write(str(pid))
     app.server.run(host= HOST, port=PORT, debug=settings.DEBUG_DASH, threaded=THREADED_RUN)
 
-# -----------------------------------------------------------------------------------------
-# -------------------------- Main ---------------------------------------------------------
-# -----------------------------------------------------------------------------------------
-# -----------------------------------------------------------------------------------------
+def shutdown_server():
+    func = flask.request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    func()
+
+@server.route('/shutdown', methods=['POST'])
+def shutdown():
+    shutdown_server()
+    return 'Server shutting down...'
 
 if __name__ == '__main__':
     run_server()
