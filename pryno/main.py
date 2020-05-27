@@ -5,7 +5,15 @@ import sys
 import datetime as dt
 import os
 from threading import Thread
-from pryno.util import settings
+
+# Checks for settings.py and creates it accordingly
+try:
+	from pryno.util import settings
+except:
+	from pryno.config import configure
+	configure.run(base_path = 'config/settings_base.py', config_path = 'config/config.json' , out_path = 'util/settings.py')
+	from pryno.util import settings
+
 from pryno.util import logger
 from pryno.strategies import pps
 from pryno.dashboard import app

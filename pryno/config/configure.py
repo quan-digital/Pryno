@@ -3,22 +3,21 @@
 # - Configure -
 # * Quan.digital *
 
-# Creates settings.py in the correct directory given config.json
-
 import shutil
 import json
 
-if __name__ == '__main__':
-
+def run(base_path = './settings_base.py', config_path = 'config.json' , out_path = '../util/settings.py'):
+    '''Creates settings.py in the correct directory given config.json.'''
+    print('No settings.py file found, generating...')
     # Copy base to correct file
-    shutil.copy2('./settings_base.py', '../util/settings.py')
+    shutil.copy2(base_path , out_path)
 
     # Load new configs
-    with open('config.json', 'r') as r:
+    with open(config_path, 'r') as r:
         configs = json.load(r)
 
     # Write new configs
-    with open('../util/settings.py', 'a') as w:
+    with open(out_path, 'a') as w:
         for key, value in configs.items():
             w.write(key)
             w.write(' = ')
@@ -32,3 +31,7 @@ if __name__ == '__main__':
                 w.write(value)
                 w.write('"')
             w.write('\n\n')
+    print('settings.py successfully created!')
+
+if __name__ == '__main__':
+    run()
