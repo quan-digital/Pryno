@@ -1,5 +1,5 @@
 # Quan Digital's Pryno
-The ultimate crypto bot dev package - Trading Infrastructure + Dashboard + Telegram Bot 🔥🦏🚀
+The ultimate crypto bot dev package - Trading Infrastructure + Dashboard + Telegram Bot 🦏🔥🚀
 
 <img src="img/cover.jpg" align="center" />
 
