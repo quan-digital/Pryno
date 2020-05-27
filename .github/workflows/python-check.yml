@@ -1,6 +1,7 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python (3.8)
+# This workflow will install Python dependencies, configure settings, 
+# run build tests and lint with a single version of Python (3.8)
 
-name: Python check
+name: Build check
 
 on:
   push:
