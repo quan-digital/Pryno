@@ -11,8 +11,12 @@ try:
 	from pryno.util import settings
 except:
 	from pryno.config import configure
-	configure.create_settings(base_path = 'config/settings_base.py', config_path = 'config/config.json' , out_path = 'util/settings.py')
-	from pryno.util import settings
+	try:
+		configure.create_settings(base_path = 'config/settings_base.py', config_path = 'config/config.json' , out_path = 'util/settings.py')
+		from pryno.util import settings
+	except:
+		configure.create_settings(base_path = 'pryno/config/settings_base.py', config_path = 'pryno/config/config.json' , out_path = 'pryno/util/settings.py')
+		from pryno.util import settings
 
 from pryno.config import configure
 from pryno.util import logger, tools
