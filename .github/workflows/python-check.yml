@@ -37,7 +37,7 @@ jobs:
         cp config_tonho5.json config.json
         python -c 'import configure; configure.create_settings()'
         cd ../..
-      - name: Test with pytest
-        run: |
-          export PYTHONPATH=pryno
-          pytest
+    - name: Test with pytest
+      run: |
+        export PYTHONPATH=pryno
+        pytest
