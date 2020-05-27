@@ -1,12 +1,15 @@
-from pryno.util import tools
+from pryno.util import tools, settings
 from subprocess import Popen
 import datetime as dt
 import time
 import sys
 import os
+import pryno.telegram_bot.quan_bot as telegram_bot
 
 
 def continuous_deployment():
+    telegram_bot.send_group_message(msg="🆕 Bot for {} is being updated".format(settings.CLIENT_NAME))
+    time.sleep(4)
     tools.kill_pids()
     os.popen("git pull")
     os.popen("chmod +x forever.py")
