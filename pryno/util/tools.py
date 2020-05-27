@@ -3,27 +3,30 @@
 # - Tools -
 # * Quan.digital *
 
-import math
 import os
 from decimal import Decimal
 import pryno.util.settings as settings
+
 
 def XBt_to_XBT(XBt):
     '''Satoshi to XBT converter.'''
     return float(XBt) / 100000000
 
-def toNearest(num, tickSize = 0.5):
+
+def toNearest(num, tickSize=0.5):
     '''Given a number, round it to the nearest tick. 
     Use this after adding/subtracting/multiplying numbers.
     More reliable than round().'''
     tickDec = Decimal(str(tickSize))
     return float((Decimal(round(num / tickSize, 0)) * tickDec))
 
+
 def order_leaves_quantity(order):
     '''Empty order checker.'''
     if order['leavesQty'] is None:
         return True
     return order['leavesQty'] > 0
+
 
 def find_by_keys(keys, table, matchData):
     '''Utility method for finding an item in the store.
@@ -37,6 +40,7 @@ def find_by_keys(keys, table, matchData):
         if all(item[k] == matchData[k] for k in keys):
             return item
 
+
 def findItemByKeys(keys, table, matchData):
     '''Different way of doing the same thing, legacy.'''
     for item in table:
@@ -46,6 +50,7 @@ def findItemByKeys(keys, table, matchData):
                 matched = False
         if matched:
             return item
+
 
 def create_dirs():
     '''Creates data directories'''
@@ -57,9 +62,11 @@ def create_dirs():
     except FileExistsError:
         print("Directories already exist.")
 
+
 def is_file_empty(file_path):
     """ Check if file is empty by confirming if its size is 0 bytes"""
     return os.path.exists(file_path) and os.stat(file_path).st_size == 0
+
 
 def kill_cd():
     '''Kill bot and forever processes.'''
@@ -73,11 +80,13 @@ def kill_cd():
     os.popen('kill %s' % pid2)
     # os.popen('kill %s' % pid3)
 
+
 def kill_pids():
     '''Kill bot and app processes.'''
     with open('pids/app.pid', 'r') as r1:
         pid1 = r1.read()
     with open('pids/bot.pid', 'r') as r2:
         pid2 = r2.read()
+    print(pid1)
     os.popen('kill %s' % pid1)
-    os.popen('kill %s' % pid2)
+    # os.popen('kill %s' % pid2)

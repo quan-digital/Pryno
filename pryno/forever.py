@@ -5,6 +5,7 @@ import time
 import sys
 import os
 
+
 def continuous_deployment():
     tools.kill_cd()
     os.popen("git pull")
@@ -19,7 +20,7 @@ if __name__ == "__main__":
     with open('pids/forever.pid', 'w') as w:
         w.write(str(pid))
     while True:
-    
+
         print("")
         print("-\*---------------|It's Fovereeeever|---------------*/-")
         print("-\*                        .                        */-")
@@ -30,5 +31,10 @@ if __name__ == "__main__":
         print("-\*                        .                        */-")
         print("-\|This time I know and there's no doubt in my mind|*/-")
         print("")
-        p = Popen("python3 " + filename, shell=True)
-        p.wait()
+        try:
+            p = Popen("python3 " + filename, shell=True)
+            p.wait()
+        except (KeyboardInterrupt, SystemExit):
+            time.sleep(4)
+            tools.kill_pids()
+            sys.exit()

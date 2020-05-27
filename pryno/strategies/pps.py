@@ -22,9 +22,10 @@ from pryno.util import logger
 # Used for reloading the bot - saves modified times of key files
 watched_files_mtimes = [(f, getmtime(f)) for f in settings.WATCHED_FILES]
 
+
 class PPS:
 
-    def __init__(self,bitmex_url ="https://testnet.bitmex.com/api/v1/", force_operate = True):
+    def __init__(self, bitmex_url="https://testnet.bitmex.com/api/v1/", force_operate=True):
         settings.STRATEGY_NAME = 'PPS'
         logger.setup_error_logger()
         sys.excepthook = logger.log_exception
@@ -40,8 +41,8 @@ class PPS:
 
         # Initialize exchange
         self.symbol = settings.SYMBOL
-        self.exchange = BitMEX(base_url=bitmex_url, 
-            symbol=self.symbol , apiKey=settings.BITMEX_KEY, apiSecret=settings.BITMEX_SECRET)
+        self.exchange = BitMEX(base_url=bitmex_url,
+                symbol=self.symbol, apiKey=settings.BITMEX_KEY, apiSecret=settings.BITMEX_SECRET)
 
         # Class parameters
         self.stopSet = 0
@@ -63,6 +64,7 @@ class PPS:
         self._ExecStatusTarget = ''
         self.botHighStepInfo = ''
         self.last_execution = ''
+        self.position = ''
         self.first_time = True
         self.aboveHighStep = False
         self.step_number = 0
@@ -70,8 +72,8 @@ class PPS:
 
         # Write operation file for bot control
         if force_operate:
-            with open (settings.LOG_DIR + 'operation.json', 'w') as op:
-                json.dump(dict(operation = True), op)
+            with open(settings.LOG_DIR + 'operation.json', 'w') as op:
+                json.dump(dict(operation=True), op)
 
         current_stop_path = settings.LOG_DIR + 'last_stop.json'
         try:
@@ -80,7 +82,7 @@ class PPS:
         except:
             self.botStopInfo = ''
 
-        telegram_bot.send_group_message(msg = "🔁 Bot for {} is starting".format(settings.CLIENT_NAME))
+        telegram_bot.send_group_message(msg="🔁 Bot for {} is starting".format(settings.CLIENT_NAME))
 
         self.logger.info("-\*---------------------|Pryno|---------------------*/-")
         self.logger.info("-\*                        .                        */-")
@@ -106,13 +108,13 @@ class PPS:
 
         sleep(1)
         self._data_dump()
-        self.__init__(settings.BASE_URL, force_operate = False)
+        self.__init__(settings.BASE_URL, force_operate=False)
         self.run_loop()
 
     def _data_dump(self):
         '''Get information needed for status from position, margin and instrument.'''
         positionQty = self.positionContracts
-        if(self.leverage == None):
+        if(self.leverage is None):
             positionLeverage = 0
         elif(self.leverage == 0):
             positionLeverage = 'Cross'
@@ -131,11 +133,11 @@ class PPS:
         volumeInst = self.instrument['volume']
         bidPrice = self.instrument['bidPrice']
         askPrice = self.instrument['askPrice']
-        #getting info to log status
-        status_dict = self.exchange.get_full_status(self.actualPrice,self.operationParameters,self.wallet_amount,
-                    self.amountOpenOrders,self.openOrders,positionQty,positionLeverage,positionLiquid,
-                unrealisedPnl,realisedPnl,avgEntryPrice,breakEvenPrice,unrealisedProfit,
-                availableMargin,markPrice,fundingRate,volumeInst,bidPrice,askPrice)
+        # getting info to log status
+        status_dict = self.exchange.get_full_status(self.actualPrice, self.operationParameters, self.wallet_amount,
+                    self.amountOpenOrders, self.openOrders, positionQty, positionLeverage, positionLiquid,
+                unrealisedPnl, realisedPnl, avgEntryPrice, breakEvenPrice, unrealisedProfit,
+                availableMargin, markPrice, fundingRate, volumeInst, bidPrice, askPrice)
 
         self.status_logger.info(str(json.dumps(status_dict)) + ",")
         current_status_path = settings.LOG_DIR + 'current_status.json'
@@ -148,12 +150,12 @@ class PPS:
         This function is responsible for all the profit logic, getting information
         whether there is a new deposit or withdrawn or sending the responding email if it's payday
         '''
-        #Path for user balance information
+        # Path for user balance information
         profit_file_path = settings.FIN_DIR + 'initialBalance.json'
 
-        #Path for register the billing invoice from the client
+        # Path for register the billing invoice from the client
         charging_file_path = settings.FIN_DIR + 'biling/'
-        #getting bitmex wallet information
+        # getting bitmex wallet information
         wallet = self.exchange.get_funds()
         file_alter = False
         checking_alterations = {}
@@ -162,24 +164,24 @@ class PPS:
         try:
             with open(profit_file_path) as f:
                 checking_alterations = json.loads(f.read())
-                payday = datetime.datetime.strptime(checking_alterations['dueDate'],"%Y-%m-%d %H:%M:%S.%f")
-                
-                #Deposits
+                payday = datetime.datetime.strptime(checking_alterations['dueDate'], "%Y-%m-%d %H:%M:%S.%f")
+
+                # Deposits
                 if wallet['deposited'] != checking_alterations['lastDeposit']:
                     delta = float(wallet['deposited']) - float(checking_alterations['lastDeposit'])
                     checking_alterations['lastDeposit'] = wallet['deposited']
                     checking_alterations['initialBalance'] = float(checking_alterations['initialBalance']) + delta
                     file_alter = True
-                    #send thorugh telegram the deposited amount
+                    # send thorugh telegram the deposited amount
                     telegram_bot.send_group_message(msg ="🔽 Client {0} deposited XBT to his account. Satoshis: {1} xBT".format(settings.CLIENT_NAME, delta))
-                #Withdrawals
+                # Withdrawals
                 if wallet['withdrawn'] != checking_alterations['lastWithdrawal']:
                     delta = float(wallet['withdrawn']) - float(checking_alterations['lastWithdrawal'])
                     checking_alterations['lastWithdrawal'] = wallet['withdrawn']
                     checking_alterations['initialBalance'] = float(checking_alterations['initialBalance']) - delta
                     file_alter = True
-                    telegram_bot.send_group_message(msg ="🔼 Client {0} withdrew {} XBT from his account. Balance: {1} XBT.".format(settings.CLIENT_NAME, tools.XBt_to_XBT(delta), tools.XBt_to_XBT(float(checking_alterations['initialBalance']))))
-                #Register the amount owed from client to us and renew bot operation for the next week to come
+                    telegram_bot.send_group_message(msg ="🔼 Client {0} withdrew {1} XBT from his account. Balance: {2} XBT.".format(settings.CLIENT_NAME, tools.XBt_to_XBT(delta), tools.XBt_to_XBT(float(checking_alterations['initialBalance']))))
+                # Register the amount owed from client to us and renew bot operation for the next week to come
                 if  payday < datetime.datetime.now():
                     start_date = datetime.datetime.strptime(checking_alterations['timestamp'],"%Y-%m-%d %H:%M:%S.%f")
                     totalProfit = float(self.wallet_amount) - float(checking_alterations['initialBalance'])
@@ -237,14 +239,15 @@ class PPS:
 
         #If profit check callback fails notify through email
         except: 
-            mail.send_mail('Some weird error at Profit check {0} '.format(traceback.format_exc()),settings.MAIL_TO_ERROR)
+            mail.send_email('Some weird error at \
+                                Profit check {0} '.format(traceback.format_exc()), settings.MAIL_TO_ERROR)
 
     def exit(self):
         self.__on_close()
 
     def __on_close(self):
         '''Handling exit.'''
-        if(self.position):
+        if(self.position != ''):
             if self.position[0]['currentQty'] == 0:
                 self.exchange.cancel_every_order()
                 self.logger.info('No positions, all orders cancelled.')
@@ -256,8 +259,8 @@ class PPS:
                 #mail.send_email(mailMessage)
         else:
             telegram_bot.send_group_message(msg ='✅ No position and no open orders, bot is shutting down')
-        os.popen('killall python3')
-        sys.exit(0)
+        # os.popen('killall python3')
+        # sys.exit(0)
 
     def prepare_order_dynamic(self,index,priceStep,one_time):
         '''
@@ -698,7 +701,7 @@ class PPS:
                     self.logger.info('There are not enough funds on the account.')
                     telegram_bot.send_group_message(msg ='💲There are not enough funds on client {1} account, turning bot off.'.format(
                                                     settings.CLIENT_NAME))
-                    sys.exit()
+                    throw('SystemExit')
 
             self.logger.info("Waiting %d seconds ..." % settings.LOOP_INTERVAL)
             self._data_dump() # write data to dashboard status

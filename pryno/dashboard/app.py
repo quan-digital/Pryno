@@ -56,9 +56,13 @@ server = app.server
 
 # Datetime update
 today = dt.datetime.today().strftime('%Y-%m-%d')
+
+
 def update_today():
     today = dt.datetime.today().strftime('%Y-%m-%d')
-    return 
+    return today
+
+
 schedule.every(120).seconds.do(update_today)
 
 # Base layout
@@ -86,6 +90,7 @@ app.layout = client_dash.clients_dash
 # -----------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------
 
+
 def load_exec():
     '''Load list of executions from csv created by bot.'''
     try:
@@ -96,6 +101,7 @@ def load_exec():
         print('No executions so far...')
         execs = {}
     return execs
+
 
 def load_errors():
     '''Load list of errors from csv created by bot.'''
@@ -108,6 +114,7 @@ def load_errors():
         errors = {}
     return errors
 
+
 def load_orders():
     '''Load list of open orders from csv created by bot.'''
     try:
@@ -118,13 +125,15 @@ def load_orders():
         orders = {}
     return orders
 
+
 def load_status():
     '''Load status dictionary from json created by bot.'''
     with open(settings.LOG_DIR + 'current_status.json', "r") as handler:
         status = json.load(handler)
     return status
 
-def load_status_series(length = 1, maxe = False, last = False):
+
+def load_status_series(length=1, maxe=False, last=False):
     '''Legacy for reading from status csv logger; used in graph and debug scenarios.'''
     with open(settings.LOG_DIR + 'status_' + today + '.json', "r") as handler:
         unhandled_json = handler.read()
@@ -134,7 +143,7 @@ def load_status_series(length = 1, maxe = False, last = False):
         unhandled_json = str(unhandled_json.split('\n')[-2])
         unhandled_json = unhandled_json[:-1]
         # Wraps [] to json core
-        unhandled_json = ''.join(('[',unhandled_json,']'))
+        unhandled_json = ''.join(('[', unhandled_json, ']'))
     # For time series, we do some serious mangling, but we get there
     elif maxe:
         unhandled_json = str(unhandled_json.split('\n')[0:-2]).replace("'", "").replace(",,", ",").replace("},]", "}]")
@@ -142,7 +151,7 @@ def load_status_series(length = 1, maxe = False, last = False):
         unhandled_json = str(unhandled_json.split('\n')[0])
         unhandled_json = unhandled_json[:-1]
         # Wraps [] to json core
-        unhandled_json = ''.join(('[',unhandled_json,']'))
+        unhandled_json = ''.join(('[', unhandled_json, ']'))
     else:
         cutLength = -(length+2)
         unhandled_json = str(unhandled_json.split('\n')[cutLength:-2]).replace("'", "").replace(",,", ",").replace("},]", "}]")
@@ -152,17 +161,20 @@ def load_status_series(length = 1, maxe = False, last = False):
     status = handled_json
     return status
 
+
 def load_initial_balance():
     '''Load initial balance from finantial directory.'''
-    with open(settings.FIN_DIR + 'initialBalance.json','rb') as handler:
+    with open(settings.FIN_DIR + 'initialBalance.json', 'rb') as handler:
         my_InitialBalance = json.loads(handler.read())
-    return float(my_InitialBalance['initialBalance']) 
+    return float(my_InitialBalance['initialBalance'])
+
 
 def get_profit():
     '''Basic Profit calculation.'''
     initBalance = load_initial_balance()
     lastBalance = load_status()['balance']
     return "{:.2%}".format(((lastBalance - initBalance)/initBalance))
+
 
 def get_stop_order(orders):
     '''Identifies stop order based on prefix and returns its price.'''
@@ -174,12 +186,13 @@ def get_stop_order(orders):
     if stop_index:
         return stop_price
     else:
-        return 0 
+        return 0
 
 # -----------------------------------------------------------------------------------------
 # --------------------Dash Callback Functions----------------------------------------------
 # -----------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------
+
 
 @app.callback([Output('status', 'children'),
                Output('timestamp', 'children'),
@@ -200,7 +213,7 @@ def get_stop_order(orders):
               [Input('interval-component', 'n_intervals')])
 def update_metrics(n):
     '''Cyclic upper data update function.'''
-    schedule.run_pending() # update today
+    schedule.run_pending()  # update today
     statusData = load_status()
     orderList = [(str(order) + '\n') for order in statusData['open_orders']]
 
@@ -224,9 +237,10 @@ def update_metrics(n):
         statusData['amplitude'] if settings.DEBUG_DASH else statusData['leverage'],
         statusData['dollar_minute'] if settings.DEBUG_DASH else statusData['avg_entry_price'],
         str(statusData['lock_anomaly']) if settings.DEBUG_DASH else [statusData['ask_price'] - statusData['bid_price']],    
-        round(tools.XBt_to_XBT(statusData['balance']),4),
-        round(tools.XBt_to_XBT(statusData['available_margin']),4)
+        round(tools.XBt_to_XBT(statusData['balance']), 4),
+        round(tools.XBt_to_XBT(statusData['available_margin']), 4)
     ]
+
 
 @app.callback([Output('executions', 'children'),
                Output('errors', 'children')],
@@ -242,6 +256,7 @@ def update_bot_metrics(n):
         errorList.reverse()
     ]
 
+
 @app.callback(Output('count_graph', 'figure'),
               [Input('interval-component', 'n_intervals')])
 def make_btc_figure(n):
@@ -255,7 +270,7 @@ def make_btc_figure(n):
             y=[float(status['latest_price']) for status in statusData],
             name='BTC Price',
             marker=dict(
-                color= '#FFCD08'
+                color='#FFCD08'
             ),
         ),
     ]
@@ -265,7 +280,7 @@ def make_btc_figure(n):
     layout_count['margin'] = dict(
         l=50,
         r=-10,
-        t = 20
+        t=20
     )
     layout_count['dragmode'] = 'select'
     layout_count['showlegend'] = False
@@ -276,10 +291,11 @@ def make_btc_figure(n):
     figure = dict(data=data, layout=layout_count)
     return figure
 
+
 @app.callback(dash.dependencies.Output('pause_message', 'children'),
-    [dash.dependencies.Input('pause_button', 'n_clicks'),
-    dash.dependencies.Input('pause_confirm', 'cancel_n_clicks_timestamp'),
-    dash.dependencies.Input('pause_confirm', 'submit_n_clicks_timestamp')])
+              [dash.dependencies.Input('pause_button', 'n_clicks'),
+              dash.dependencies.Input('pause_confirm', 'cancel_n_clicks_timestamp'),
+              dash.dependencies.Input('pause_confirm', 'submit_n_clicks_timestamp')])
 def update_output(n_clicks, cancel_n_clicks_timestamp, submit_n_clicks_timestamp):
     '''Bot operation button handling.'''
     username = flask.request.authorization['username']
@@ -290,12 +306,12 @@ def update_output(n_clicks, cancel_n_clicks_timestamp, submit_n_clicks_timestamp
     if n_clicks:
         if username in settings.ADMIN_USERS:
             if submit_n_clicks_timestamp > cancel_n_clicks_timestamp:
-                with open (settings.LOG_DIR + 'operation.json', 'w') as op:
+                with open(settings.LOG_DIR + 'operation.json', 'w') as op:
                     json.dump(dict(operation = True), op)
                 settings._PAUSE_BOT = False
                 return
             else:
-                with open (settings.LOG_DIR + 'operation.json', 'w') as op:
+                with open(settings.LOG_DIR + 'operation.json', 'w') as op:
                     json.dump(dict(operation = False), op)
                 settings._PAUSE_BOT = True
                 return
@@ -303,6 +319,7 @@ def update_output(n_clicks, cancel_n_clicks_timestamp, submit_n_clicks_timestamp
             return
     else:
         return
+
 
 @app.callback([dash.dependencies.Output('html_p1', 'children'),
     dash.dependencies.Output('html_p2', 'children'),
@@ -327,7 +344,8 @@ def check_user_privilege(n):
         html_p3 = 'Avg Entry'
         html_p4 = 'Spread'
         html_p5 = 'Order History'
-    return [html_p1, html_p2,html_p3,html_p4,html_p5]
+    return [html_p1, html_p2, html_p3, html_p4, html_p5]
+
 
 @app.callback([dash.dependencies.Output('button_name','children')],
               [Input('interval-component', 'n_intervals')])
@@ -349,9 +367,12 @@ def check_button_user(n):
 def run_server():
     print("Dashboard app server started running.")
     pid = os.getpid()
+    response = os.popen("ps -ef | grep python")
+    print(response)
     with open('pids/app.pid', 'w') as w:
         w.write(str(pid))
-    app.server.run(host= HOST, port=PORT, debug=settings.DEBUG_DASH, threaded=THREADED_RUN)
+    app.server.run(host=HOST, port=PORT, debug=settings.DEBUG_DASH, threaded=THREADED_RUN)
+
 
 def shutdown_server():
     func = flask.request.environ.get('werkzeug.server.shutdown')
@@ -359,10 +380,12 @@ def shutdown_server():
         raise RuntimeError('Not running with the Werkzeug Server')
     func()
 
+
 @server.route('/shutdown', methods=['POST'])
 def shutdown():
     shutdown_server()
     return 'Server shutting down...'
+
 
 @server.route('/reset', methods=['POST'])
 def process_json():
@@ -370,6 +393,7 @@ def process_json():
     if input_json.get('pwd') == 'kero10gostosasda19computacao':
         continuous_deployment()
         run_server()
+
 
 if __name__ == '__main__':
     run_server()
