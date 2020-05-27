@@ -7,7 +7,7 @@ import os
 
 
 def continuous_deployment():
-    tools.kill_cd()
+    tools.kill_pids()
     os.popen("git pull")
     os.popen("chmod +x forever.py")
     time.sleep(5)

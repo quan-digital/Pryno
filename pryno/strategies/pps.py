@@ -615,7 +615,7 @@ class PPS:
                     if(self.leverage != settings.ISOLATED_MARGIN_FACTOR):
                         self.exchange.isolate_margin('XBTUSD',settings.ISOLATED_MARGIN_FACTOR)
                     else:
-                        self.logger.info('Leverage setted to {0}'.format(settings.ISOLATED_MARGIN_FACTOR))
+                        self.logger.info('Leverage set to {0}'.format(settings.ISOLATED_MARGIN_FACTOR))
                 else:
                     self.logger.info('no leverage to be setted for now')
 
