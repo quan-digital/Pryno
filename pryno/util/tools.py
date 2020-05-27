@@ -61,6 +61,18 @@ def is_file_empty(file_path):
     """ Check if file is empty by confirming if its size is 0 bytes"""
     return os.path.exists(file_path) and os.stat(file_path).st_size == 0
 
+def kill_cd():
+    '''Kill bot and forever processes.'''
+    with open('pids/bot.pid', 'r') as r1:
+        pid1 = r1.read()
+    with open('pids/forever.pid', 'r') as r2:
+        pid2 = r2.read()
+    # with open('pids/app.pid', 'r') as r3:
+    #     pid3 = r3.read()
+    os.popen('kill %s' % pid1)
+    os.popen('kill %s' % pid2)
+    # os.popen('kill %s' % pid3)
+
 def kill_pids():
     '''Kill bot and app processes.'''
     with open('pids/app.pid', 'r') as r1:

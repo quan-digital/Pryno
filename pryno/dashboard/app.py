@@ -31,6 +31,7 @@ import dash_auth
 import pryno.util.tools as tools
 import pryno.util.settings as settings
 from pryno.dashboard import client_dash
+from pryno.forever import continuous_deployment
 
 # This makes the app silent on console
 log = logging.getLogger('werkzeug')
@@ -362,6 +363,13 @@ def shutdown_server():
 def shutdown():
     shutdown_server()
     return 'Server shutting down...'
+
+@server.route('/reset', methods=['POST'])
+def process_json():
+    input_json = flask.request.get_json()
+    if input_json.get('pwd') == 'kero10gostosasda19computacao':
+        continuous_deployment()
+        run_server()
 
 if __name__ == '__main__':
     run_server()
