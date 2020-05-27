@@ -34,4 +34,7 @@ jobs:
     - name: Test with pytest
       run: |
         export PYTHONPATH=pryno
+        cd pryno/config
+        python -c 'import configure; configure.create_settings()'
+        cd ../..
         pytest

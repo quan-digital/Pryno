@@ -1,5 +1,5 @@
 import importlib
-from pryno.main import build_bot, build_app
+from main import build_bot, build_app
 
 # export PYTHONPATH=pryno
 
