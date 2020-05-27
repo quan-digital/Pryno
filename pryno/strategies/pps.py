@@ -701,7 +701,7 @@ class PPS:
                     self.logger.info('There are not enough funds on the account.')
                     telegram_bot.send_group_message(msg ='💲There are not enough funds on client {1} account, turning bot off.'.format(
                                                     settings.CLIENT_NAME))
-                    throw('SystemExit')
+                    raise SystemExit('Not enough funds on account')
 
             self.logger.info("Waiting %d seconds ..." % settings.LOOP_INTERVAL)
             self._data_dump() # write data to dashboard status
