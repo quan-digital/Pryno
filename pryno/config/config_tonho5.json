@@ -1,0 +1,6 @@
+{
+    "CLIENT_NAME" : "Client",
+    "CLIENT_PWD" : "pass",
+    "BITMEX_KEY" : "12345678901234567890",
+    "BITMEX_SECRET" : "12345678901234567890"
+}

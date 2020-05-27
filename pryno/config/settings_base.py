@@ -10,39 +10,13 @@ BASE_URL = "https://testnet.bitmex.com/api/v1/"
 # BASE_URL = "https://www.bitmex.com/api/v1/"
 
 # Bot email
-CLIENT_NAME = 'Cthulhu'
+CLIENT_NAME = ''
+CLIENT_PWD = ''
 STRATEGY_NAME = 'PPS'
 
-# Bitmex API Key Pairs
-
-# kaue@gmail : pryno : TESTNET
-BITMEX_KEY = "0aV6qmThEH680-8OKSlnx__J"
-BITMEX_SECRET = "2G74dk7eCLhEErpTmFq6TTOj8HX_NvRZ2hfOmunJ7U9fxCnx"s
-
-# kraudin : dindin : MAINNET
-# BITMEX_KEY = "iF2-k82rs_uWKN1Y29xUnNlY"
-# BITMEX_SECRET = "Hqj3lyCVRfAiXNbXKB34LNL-PU_vek2vjsaYJ76CxGPL-I2i"
-
-# kaue@gmail : seila : TESTNET
-# BITMEX_KEY = "rolMDEfUQwwASTckmugBkeM5"
-# BITMEX_SECRET = "anR6vCI74u10ggGAxAlCVN05ITrtC8bwiK4_s86vtXRARddP"
-
-#DALLAS
-# bitmex_key = "kduY6LrC2NGcTKMalNgzgiHD"
-# bitmex_secret =  "RiEKMY2Xxuk4AGDjmXhQImxMpQ6FSHusyPgHaGwPOAMiE6gP"
-
-#MATT
-# bitmex_key = "gApIJjnEDjpx5cK9BiTYc22r"
-# bitmex_secret =  "LPQFjdUnf1bZZMi12YdUVQWlq_VfllDpwdSb-C1WWPFOsLxa"
-
-# kaue@elint : 211 : TESTNET
-# bitmex_key = "xN_wtdAuDF8H3EPjDE_VkqEW"
-# bitmex_secret = "0Q9fxMmz9cxgkLnHKYm00ZAFrqBaFYreqnMheASq8f9CgBKQ"
-
-# elintdata@gmail.com : bot1 : BITMEX
-# bitmex_key = "7JEjfUfpt7T9gMno8NSw86Ld"
-# bitmex_secret = "Qya14PDUSNc8w7gRG_XGrv_Gy0IczQeeKrumVxsPhF6JnFdr"
-
+# Bitmex API Key Pair
+BITMEX_KEY = ""
+BITMEX_SECRET = ""
 
 #####################################################
 # Operation Parameters
@@ -125,12 +99,9 @@ VALID_USERNAME_PASSWORD_PAIRS = {
     'kaue':'greekgod',
     'antonio':'gayragnar',
     'xande':'bumbumza1',
-    'fonfon':'zangief',
-    'carlao':'cafetao',
-    'felipe':'comunista',
     'pynoclient' : 'capile123',
-    'dallas' : 'KARMAdemo2020',
-    'matt' : 'KARMAdemo2020'
+    CLIENT_NAME : CLIENT_PWD
+
 }
 
 ADMIN_USERS = {
@@ -138,9 +109,6 @@ ADMIN_USERS = {
     'kaue':'greekgod',
     'antonio':'gayragnar',
     'xande':'bumbumza1',
-    'fonfon':'zangief',
-    'carlao':'cafetao',
-    'felipe':'comunista'
 }
 
 
@@ -153,9 +121,6 @@ POST_ONLY = False
 
 # Time interval to analyse candles
 CANDLE_TIME_INTERVAL = 60
-
-# Number of times sanity check must be false in order to restart the websocket
-SANITY_LIMIT = 2
 
 # In seconds
 AUTH_EXPIRE_TIME = 10
@@ -171,19 +136,6 @@ HTTP_MAX_RETRIES = 10
 ORDER_MAX_RETRIES = 10
 
 VOLUME_TOLERANCE = 10000000
-
-#####################################################
-# Websocket
-#####################################################
-
-# Don't grow a table larger than 200. Helps cap memory usage.
-MAX_TABLE_LEN = 200
-
-# Timeout for Websocket, in seconds
-WS_TIMEOUT = 5
-
-# You can sub to orderBookL2 for all levels, or orderBook10 for top 10 levels & save bandwidth
-ORDERBOOK = "orderBook10"
 
 
 #####################################################
