@@ -11,12 +11,8 @@ try:
 	from pryno.util import settings
 except:
 	from pryno.config import configure
-	try:
-		configure.create_settings(base_path = 'config/settings_base.py', config_path = 'config/config.json' , out_path = 'util/settings.py')
-		from pryno.util import settings
-	except:
-		configure.create_settings(base_path = 'pryno/config/settings_base.py', config_path = 'pryno/config/config.json' , out_path = 'pryno/util/settings.py')
-		from pryno.util import settings
+	configure.create_settings(base_path = 'config/settings_base.py', config_path = 'config/config.json' , out_path = 'util/settings.py')
+	from pryno.util import settings
 
 from pryno.config import configure
 from pryno.util import logger, tools
@@ -45,19 +41,19 @@ def build_app():
 	except:
 		return False
 
-# if __name__ =='__main__':
-# 	try:
-# 		tools.create_dirs()
-# 		# Build new settings to handle updates
-# 		configure.create_settings(base_path = 'config/settings_base.py', config_path = 'config/config.json' , out_path = 'util/settings.py')
-# 		pid = os.getpid()
-# 		with open('pids/bot.pid', 'w') as w:
-# 			w.write(str(pid))
-# 		mm = pps.PPS(settings.BASE_URL)
-# 		Thread(target = app.run_server).start()
-# 		mm.run_loop()
-# 	except (KeyboardInterrupt, SystemExit):
-# 		#mm.exchange.cancel_every_order()
-# 		mm.exit()
-# 		sys.exit()
-# 		# os.popen('killall python3')
+if __name__ =='__main__':
+	try:
+		tools.create_dirs()
+		# Build new settings to handle updates
+		configure.create_settings(base_path = 'config/settings_base.py', config_path = 'config/config.json' , out_path = 'util/settings.py')
+		pid = os.getpid()
+		with open('pids/bot.pid', 'w') as w:
+			w.write(str(pid))
+		mm = pps.PPS(settings.BASE_URL)
+		Thread(target = app.run_server).start()
+		mm.run_loop()
+	except (KeyboardInterrupt, SystemExit):
+		#mm.exchange.cancel_every_order()
+		mm.exit()
+		sys.exit()
+		# os.popen('killall python3')

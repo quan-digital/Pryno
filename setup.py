@@ -5,7 +5,7 @@ from os.path import join, dirname
 here = dirname(__file__)
 
 setup(name='pryno',
-      version='0.1.0',
+      version='0.1.5',
       description='BitMEX autonomous trading using Keep Alive HTTP + Plot.ly Dash + Telegram API.',
       long_description=open(join(here, 'README.md')).read(),
       author='canokaue & claudiovb',
