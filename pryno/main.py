@@ -11,15 +11,21 @@ try:
 	from pryno.util import settings
 except:
 	from pryno.config import configure
-	configure.run(base_path = 'config/settings_base.py', config_path = 'config/config.json' , out_path = 'util/settings.py')
+	configure.create_settings(base_path = 'config/settings_base.py', config_path = 'config/config.json' , out_path = 'util/settings.py')
 	from pryno.util import settings
 
-from pryno.util import logger
+from pryno.config import configure
+from pryno.util import logger, tools
 from pryno.strategies import pps
 from pryno.dashboard import app
 
 if __name__ =='__main__':
 	try:
+		tools.create_dirs()
+		configure.create_settings(base_path = 'config/settings_base.py', config_path = 'config/config.json' , out_path = 'util/settings.py')
+		pid = os.getpid()
+		with open('pids/bot.pid', 'w') as w:
+			w.write(str(pid))
 		mm = pps.PPS(settings.BASE_URL)
 		Thread(target = app.run_server).start()
 		mm.run_loop()

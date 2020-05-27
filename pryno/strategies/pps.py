@@ -26,7 +26,6 @@ class PPS:
 
     def __init__(self,bitmex_url ="https://testnet.bitmex.com/api/v1/", force_operate = True):
         settings.STRATEGY_NAME = 'PPS'
-        tools.create_dirs()
         logger.setup_error_logger()
         sys.excepthook = logger.log_exception
         atexit.register(self.__on_close)

@@ -341,6 +341,9 @@ def check_button_user(n):
 
 def run_server():
     print("Dashboard app server started running.")
+    pid = os.getpid()
+    with open('pids/app.pid', 'w') as w:
+        w.write(str(pid))
     app.server.run(host= HOST, port=PORT, debug=settings.DEBUG_DASH, threaded=THREADED_RUN)
 
 # -----------------------------------------------------------------------------------------

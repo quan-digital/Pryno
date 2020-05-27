@@ -9,8 +9,8 @@ import sys
 import os
 from logging.handlers import RotatingFileHandler
 from datetime import datetime
-import pryno.util.settings as settings
-import pryno.telegram_bot.quan_bot as telegram_bot
+from pryno.util import settings, tools
+from pryno.telegram_bot import quan_bot as telegram_bot
 
 def setup_logger():
     '''Prints logger info to terminal'''
@@ -128,7 +128,8 @@ def log_exception(exc_type, exc_value, exc_traceback):
     telegram_bot.send_group_message(msg="❗ Exception ocurred for {0} at {1}, here's the traceback: \n {2}".format(
                                                     settings.CLIENT_NAME,str(datetime.now()),message))
 
-    os.popen('killall python3')
+    tools.kill_pids()
+    # os.popen('killall python3')
     # os.popen('sudo killall -9 python3') # force kill extreme
     # os.popen('python3 main.py')
     return
@@ -144,5 +145,6 @@ def log_error(message):
     if 'Restarting...' not in message:
         telegram_bot.send_group_message(msg="🚨 Error ocurred for {0} at {1}, here's the traceback: {2}".format(
                                                     settings.CLIENT_NAME,str(datetime.now()),message))
-    os.popen('killall python3')
+    tools.kill_pids()
+    # os.popen('killall python3')
     return
