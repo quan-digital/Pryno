@@ -1,4 +1,14 @@
-from pryno.util import tools, settings
+from pryno.util import tools
+
+# Checks for settings.py and creates it accordingly
+try:
+	from pryno.util import settings
+except:
+	print('No settings.py found!')
+	from pryno.config import configure
+	configure.create_settings(base_path='config/settings_base.py', config_path='config/config.json' , out_path = 'util/settings.py')
+	from pryno.util import settings
+
 from subprocess import Popen
 import datetime as dt
 import time
