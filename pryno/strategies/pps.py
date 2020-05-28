@@ -82,7 +82,7 @@ class PPS:
         except:
             self.botStopInfo = ''
 
-        telegram_bot.send_group_message(msg="🔁 Bot for {0} is starting with strategy {1} v {2}".format(settings.CLIENT_NAME,
+        telegram_bot.send_group_message(msg="🔁 Bot for {0} starting with strategy {1} v {2}".format(settings.CLIENT_NAME,
                 settings.STRATEGY_NAME, settings.BOT_VERSION))
 
         self.logger.info("-\*---------------------|Pryno|---------------------*/-")
