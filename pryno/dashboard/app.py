@@ -21,7 +21,7 @@ import requests
 import logging
 import flask
 from flask_login import user_logged_in
-from flask import Flask
+from flask import Flask, request
 import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
@@ -32,7 +32,8 @@ import pryno.util.tools as tools
 import pryno.util.settings as settings
 from pryno.dashboard import client_dash
 from pryno.forever import continuous_deployment
-
+import time
+from threading import Timer
 # This makes the app silent on console
 log = logging.getLogger('werkzeug')
 log.setLevel(logging.ERROR)
@@ -42,6 +43,9 @@ THREADED_RUN = True
 
 # Make 80 for AWS EC2, default is 5000
 PORT = 80
+
+#Is resetting
+is_resetting = False
 
 # Make 0.0.0.0 to IP redirect, default is 127.0.0.1
 HOST = '0.0.0.0'
@@ -391,9 +395,11 @@ def shutdown():
 def process_json():
     input_json = flask.request.get_json()
     if input_json.get('pwd') == 'kero10gostosasda19computacao':
-        continuous_deployment()
-        run_server()
-
+        r = Timer(4.0, continuous_deployment)
+        r.start()
+        return 'Reseting bot', 200
+    else:
+        return 'Wrong credentials', 400
 
 if __name__ == '__main__':
     run_server()
