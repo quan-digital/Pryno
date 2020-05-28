@@ -9,7 +9,7 @@ import json
 
 def create_settings(base_path = './settings_base.py', config_path = 'config.json' , out_path = '../util/settings.py'):
     '''Creates settings.py in the correct directory given config.json.'''
-    print('No settings.py file found, generating...')
+    print('Generating settings.py...')
     # Copy base to correct file
     shutil.copy2(base_path , out_path)
 

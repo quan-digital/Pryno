@@ -170,7 +170,7 @@ _REACHED_TARGET  = False
 _PAUSE_BOT = False
 
 # Project version from setuptools
-BOT_VERSION = str(pkg_resources.require("pryno")[0].version).replace(".","")
+BOT_VERSION = str(pkg_resources.require("pryno")[0].version)
 
 #####################################################
 # Mail & Telegram
