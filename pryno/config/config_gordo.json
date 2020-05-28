@@ -8,6 +8,7 @@
     "CONTRACT_PCT": 0.2175,
     "TOTAL_STEP": 10,
     "FIXED_MARGIN_FLAG": false,
-    "SEND_EMAIL_GRADLE": 5
+    "SEND_EMAIL_GRADLE": 5,
+    "MIN_FUNDS": 10000
 
 }

@@ -6,8 +6,8 @@
 import pkg_resources  
 
 # API URL
-# BASE_URL = "https://testnet.bitmex.com/api/v1/"
-BASE_URL = "https://www.bitmex.com/api/v1/"
+BASE_URL = "https://testnet.bitmex.com/api/v1/"
+# BASE_URL = "https://www.bitmex.com/api/v1/"
 
 # Bot email
 CLIENT_NAME = ''

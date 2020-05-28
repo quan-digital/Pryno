@@ -30,7 +30,8 @@ class PPS:
         logger.setup_error_logger()
         sys.excepthook = logger.log_exception
         atexit.register(self.__on_close)
-        self.logger = logger.setup_logger()
+        # self.logger = logger.setup_logger()
+        self.logger = logger.setup_logbook_info(name="web_log")
         self.logger.info("Pryno is starting.")
         self.SLEEP_TELEGRAM = settings.SLEEP_TELEGRAM
 
@@ -684,7 +685,7 @@ class PPS:
                 self.logger.info("~: Bot is Running :~") 
 
                 # Check if user has minimun balance to operate
-                if(self.available_margin['availableMargin'] > 10000):
+                if(self.available_margin['availableMargin'] > settings.MIN_FUNDS):
 
                     # Check if it's in position
                     if(self.positionContracts == 0):
