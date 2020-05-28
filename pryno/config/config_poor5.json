@@ -1,0 +1,12 @@
+{
+    "CLIENT_NAME" : "Client",
+    "CLIENT_PWD" : "pass",
+    "BITMEX_KEY" : "1234567890abcabc",
+    "BITMEX_SECRET" : "1234567890abcdefghijkkk",
+    "FIXED_STEP" : 30,
+    "ISOLATED_MARGIN_FACTOR": 5,
+    "CONTRACT_PCT": 0.1075,
+    "TOTAL_STEP": 5,
+    "FIXED_MARGIN_FLAG": true,
+    "SEND_EMAIL_GRADLE": 3
+}
