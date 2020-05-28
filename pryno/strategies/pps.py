@@ -64,7 +64,7 @@ class PPS:
         self._ExecStatusTarget = ''
         self.botHighStepInfo = ''
         self.last_execution = ''
-        self.position = ''
+        self.position = []
         self.first_time = True
         self.aboveHighStep = False
         self.step_number = 0
@@ -248,11 +248,11 @@ class PPS:
 
     def __on_close(self):
         '''Handling exit.'''
-        if(self.position != ''):
+        if(not self.position):
             if self.position[0]['currentQty'] == 0:
                 self.exchange.cancel_every_order()
                 self.logger.info('No positions, all orders cancelled.')
-                telegram_bot.send_group_message(msg =' ✅ No position, all orders cancelled and bot paused for {0}'.format(settings.CLIENT_NAME))
+                telegram_bot.send_group_message(msg=' ✅ No position, all orders cancelled and bot paused for {0}'.format(settings.CLIENT_NAME))
             else:
                 self.logger.warning('Position found, orders still active!')
                 mailMessage = str('🚨🚨🚨 Position found, and bot its turning off, orders still active for {0}:'.format(settings.CLIENT_NAME))
