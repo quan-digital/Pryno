@@ -9,6 +9,7 @@
     "TOTAL_STEP": 5,
     "FIXED_MARGIN_FLAG": true,
     "SEND_EMAIL_GRADLE": 3,
-    "MIN_FUNDS": 10000
+    "MIN_FUNDS": 10000,
+    "BASE_URL" : "https://bitmex.com/api/v1/"
 
 }

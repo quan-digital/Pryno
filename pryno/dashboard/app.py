@@ -28,8 +28,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
 import dash_auth
-import pryno.util.tools as tools
-import pryno.util.settings as settings
+from pryno.util import settings, tools
 from pryno.dashboard import client_dash
 from pryno.forever import continuous_deployment
 import time
@@ -400,6 +399,48 @@ def process_json():
         return 'Reseting bot', 200
     else:
         return 'Wrong credentials', 400
+
+@server.route('/api')
+def api_data():
+    filename = 'api_' + dt.datetime.today().strftime('%Y-%m-%d') + '.txt'
+    complete_path = settings.LOG_DIR + filename
+    with open (complete_path, 'r') as r:
+        data = r.read()
+        data = data.split('\n')
+        data.reverse()
+        return flask.render_template('logs.html', filename = filename, data = data,
+                                     account = settings.CLIENT_NAME, lastup = str(dt.datetime.now()))
+
+@server.route('/errors')
+def error_data():
+    filename = 'errors_' + dt.datetime.today().strftime('%Y-%m-%d') + '.txt'
+    complete_path = settings.LOG_DIR + filename
+    with open (complete_path, 'r') as r:
+        data = r.read()
+        data = str(data).split('\n')
+        data.reverse()
+        return flask.render_template('logs.html', filename = filename, data = data,
+                                     account = settings.CLIENT_NAME, lastup = str(dt.datetime.now()))
+
+@server.route('/subsonicevilneedle')
+def pps_data():
+    filename = 'pps_' + dt.datetime.today().strftime('%Y-%m-%d') + '.txt'
+    complete_path = settings.LOG_DIR + filename
+    with open (complete_path, 'r') as r:
+        data = r.read()
+        data = data.split('\n')
+        data.reverse()
+        return flask.render_template('logs.html', filename = filename, data = data,
+                                     account = settings.CLIENT_NAME, lastup = str(dt.datetime.now()))
+
+@server.route('/status')
+def status_data():
+    filename = 'status_' + dt.datetime.today().strftime('%Y-%m-%d') + '.json'
+    complete_path = settings.LOG_DIR + filename
+    data = load_status_series(length=0, maxe=True)
+    data.reverse()
+    return flask.render_template('logs.html', filename = filename, data = data,
+                                    account = settings.CLIENT_NAME, lastup = str(dt.datetime.now()))
 
 if __name__ == '__main__':
     run_server()

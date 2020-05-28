@@ -31,29 +31,9 @@ def setup_logbook(name, extension='.txt', level=logging.INFO):
     log_path = str(settings.LOG_DIR + name +'_' + date + extension)
     handler = RotatingFileHandler(log_path, maxBytes=settings.MAX_FILE_SIZE, backupCount=1)
     handler.setFormatter(formatter)
-
     logger = logging.getLogger(name)
     logger.setLevel(level)
     logger.addHandler(handler)
-
-    return logger
-
-
-def setup_logbook_info(name, extension='.txt',level=logging.INFO):
-    """Setup logger that writes to file and log, supports multiple instances with no overlap.
-       Available levels: DEBUG|INFO|WARN|ERROR"""
-    formatter_debug = logging.Formatter(fmt='%(asctime)s.%(msecs)03d (%(name)s) - %(levelname)s - %(message)s', datefmt='%d-%m-%y %H:%M:%S')
-    date = datetime.today().strftime('%Y-%m-%d')
-    log_path = str(settings.LOG_DIR + name +'_' + date + extension)
-    handler = RotatingFileHandler(log_path, maxBytes=settings.MAX_FILE_SIZE, backupCount=1)
-    ch = logging.StreamHandler()
-    handler.setFormatter(formatter_debug)
-    ch.setFormatter(formatter_debug)
-    logger = logging.getLogger(name)
-    logger.setLevel(level)
-    logger.addHandler(handler)
-    logger.addHandler(ch)
-
     return logger
 
 

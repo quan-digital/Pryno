@@ -31,7 +31,7 @@ class PPS:
         sys.excepthook = logger.log_exception
         atexit.register(self.__on_close)
         # self.logger = logger.setup_logger()
-        self.logger = logger.setup_logbook_info(name="web_log")
+        self.logger = logger.setup_logbook(name="pps")
         self.logger.info("Pryno is starting.")
         self.SLEEP_TELEGRAM = settings.SLEEP_TELEGRAM
 

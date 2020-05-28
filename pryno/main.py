@@ -14,7 +14,7 @@ except:
 	from pryno.util import settings
 
 from pryno.config import configure
-from pryno.util import tools
+from pryno.util import tools, logger
 from pryno.strategies import pps
 from pryno.dashboard import app
 
@@ -46,6 +46,7 @@ def build_app():
 
 if __name__ == '__main__':
 	try:
+		logger.setup_logger()
 		tools.create_dirs()
 		# Build new settings to handle updates
 		configure.create_settings(base_path='config/settings_base.py', config_path='config/config.json', out_path='util/settings.py')

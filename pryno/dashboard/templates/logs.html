@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Logs</title>
+    <link href="../assets/s1.css" rel="stylesheet">
+</head>
+<body>
+    <div>
+        <h2>Displaying logs for {{filename}}</h2>
+        <br>
+        <h6>Account: {{account}}</h6>
+        <h6>Last updated: {{lastup}}</h6>
+        <br>
+    </div>
+    <div class="pretty_container">
+        {% for item in data %}
+        <p>{{item}}</p>
+        {% endfor %}
+    </div>
+</body>
+</html>

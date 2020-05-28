@@ -22,6 +22,7 @@ def continuous_deployment():
     time.sleep(4)
     tools.kill_pids()
     os.popen("git pull")
+    os.popen("pip3 install -e ../.")
     os.popen("chmod +x forever.py")
     time.sleep(5)
     os.popen("python3 forever.py main.py")
