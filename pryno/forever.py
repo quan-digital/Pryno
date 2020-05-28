@@ -8,7 +8,8 @@ import pryno.telegram_bot.quan_bot as telegram_bot
 
 
 def continuous_deployment():
-    telegram_bot.send_group_message(msg="🆕 Bot for {} is being updated".format(settings.CLIENT_NAME))
+    telegram_bot.send_group_message(msg="🆕 Bot for {0} is being updated\
+         currently on version {1}".format(settings.CLIENT_NAME, settings.BOT_VERSION))
     time.sleep(4)
     tools.kill_pids()
     os.popen("git pull")
