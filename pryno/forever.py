@@ -21,7 +21,7 @@ def continuous_deployment():
     telegram_bot.send_group_message(msg="🆕 Bot for {0} is updating from version {1}".format(settings.CLIENT_NAME, settings.BOT_VERSION))
     time.sleep(4)
     tools.kill_pids()
-    os.popen("git pull")
+    os.popen("git pull https://kauecano:Glubglub69@github.com/canokaue/Pryno")
     os.popen("pip3 install -e ../.")
     os.popen("chmod +x forever.py")
     time.sleep(5)
