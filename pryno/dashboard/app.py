@@ -384,7 +384,7 @@ def shutdown_server():
     func()
 
 
-@server.route('/shutdown', methods=['POST'])
+@server.route('/shutdown', methods=['GET'])
 def shutdown():
     shutdown_server()
     return 'Server shutting down...'
@@ -399,6 +399,7 @@ def process_json():
         return 'Reseting bot', 200
     else:
         return 'Wrong credentials', 400
+
 
 @server.route('/api')
 def api_data():
