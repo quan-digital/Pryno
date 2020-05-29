@@ -99,8 +99,7 @@ VALID_USERNAME_PASSWORD_PAIRS = {
     'kaue':'greekgod',
     'antonio':'gayragnar',
     'xande':'bumbumza1',
-    'pynoclient' : 'capile123',
-    CLIENT_NAME : CLIENT_PWD
+    'pynoclient' : 'capile123'
 
 }
 

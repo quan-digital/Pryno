@@ -12,6 +12,7 @@ except:
 	from pryno.config import configure
 	configure.create_settings(base_path='config/settings_base.py', config_path='config/config.json' , out_path = 'util/settings.py')
 	from pryno.util import settings
+	settings.VALID_USERNAME_PASSWORD_PAIRS.update({settings.CLIENT_NAME: settings.CLIENT_PWD})
 
 from pryno.config import configure
 from pryno.util import tools, logger
@@ -50,6 +51,7 @@ if __name__ == '__main__':
 		tools.create_dirs()
 		# Build new settings to handle updates
 		configure.create_settings(base_path='config/settings_base.py', config_path='config/config.json', out_path='util/settings.py')
+		settings.VALID_USERNAME_PASSWORD_PAIRS.update({settings.CLIENT_NAME: settings.CLIENT_PWD})
 		pid = os.getpid()
 		with open('pids/bot.pid', 'w') as w:
 			w.write(str(pid))
