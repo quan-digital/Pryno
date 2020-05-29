@@ -369,7 +369,7 @@ clients_dash = html.Div(
                 ),
 
                     html.P(
-                    'Pryno Dashboard BETA v {0}- © Quan Digital 2020'.format(settings.BOT_VERSION),
+                    'Pryno Dashboard <b>BETA v {0}</b> - © Quan Digital 2020'.format(settings.BOT_VERSION),
                     style={
                         'padding-left':'165px',
                             'font-size': '1.5rem',
