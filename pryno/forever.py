@@ -20,19 +20,28 @@ import pryno.telegram_bot.quan_bot as telegram_bot
 
 def continuous_deployment():
     telegram_bot.send_group_message(msg="🆕 Bot for {0} is updating from version {1}".format(settings.CLIENT_NAME, settings.BOT_VERSION))
-    time.sleep(4)
+    time.sleep(1)
     tools.kill_pids()
     # app.shutdown_server()
     os.popen("git pull https://kauecano:Glubglub69@github.com/canokaue/Pryno")
-    os.popen("pip3 install -e ../.")
+    time.sleep(4)
     os.popen("chmod +x forever.py")
-    time.sleep(5)
-    os.popen("python3 forever.py main.py")
+    os.popen("python3 forever.py main.py True")
 
 
 if __name__ == "__main__":
     tools.create_dirs()
     filename = sys.argv[1]
+
+    # if sys.argv[2] is None:
+    #     reinstall = False
+    # else:
+    #     reinstall = True
+    # if reinstall:
+    time.sleep(1)
+    os.popen("pip3 install -e ../.") # not working
+    time.sleep(7)
+
     pid = os.getpid()
     with open('pids/forever.pid', 'w') as w:
         w.write(str(pid))
