@@ -402,45 +402,59 @@ def process_json():
 
 @server.route('/api')
 def api_data():
-    filename = 'api_' + dt.datetime.today().strftime('%Y-%m-%d') + '.txt'
-    complete_path = settings.LOG_DIR + filename
-    with open (complete_path, 'r') as r:
-        data = r.read()
-        data = data.split('\n')
-        data.reverse()
-        return flask.render_template('logs.html', filename = filename, data = data,
-                                     account = settings.CLIENT_NAME, lastup = str(dt.datetime.now()))
+    if(flask.request.authorization):
+        filename = 'api_' + dt.datetime.today().strftime('%Y-%m-%d') + '.txt'
+        complete_path = settings.LOG_DIR + filename
+        with open (complete_path, 'r') as r:
+            data = r.read()
+            data = data.split('\n')
+            data.reverse()
+            return flask.render_template('logs.html', filename = filename, data = data,
+                                         account = settings.CLIENT_NAME, lastup = str(dt.datetime.now()))
+    else:
+        return flask.render_template('unauthorized.html')
+
 
 @server.route('/errors')
 def error_data():
-    filename = 'errors_' + dt.datetime.today().strftime('%Y-%m-%d') + '.txt'
-    complete_path = settings.LOG_DIR + filename
-    with open (complete_path, 'r') as r:
-        data = r.read()
-        data = str(data).split('\n')
-        data.reverse()
-        return flask.render_template('logs.html', filename = filename, data = data,
+    if(flask.request.authorization):
+        filename = 'errors_' + dt.datetime.today().strftime('%Y-%m-%d') + '.txt'
+        complete_path = settings.LOG_DIR + filename
+        with open (complete_path, 'r') as r:
+            data = r.read()
+            data = str(data).split('\n')
+            data.reverse()
+            return flask.render_template('logs.html', filename = filename, data = data,
                                      account = settings.CLIENT_NAME, lastup = str(dt.datetime.now()))
+    else:
+        return flask.render_template('unauthorized.html')
 
 @server.route('/subsonicevilneedle')
 def pps_data():
-    filename = 'pps_' + dt.datetime.today().strftime('%Y-%m-%d') + '.txt'
-    complete_path = settings.LOG_DIR + filename
-    with open (complete_path, 'r') as r:
-        data = r.read()
-        data = data.split('\n')
-        data.reverse()
-        return flask.render_template('logs.html', filename = filename, data = data,
-                                     account = settings.CLIENT_NAME, lastup = str(dt.datetime.now()))
+    if(flask.request.authorization):
+        filename = 'pps_' + dt.datetime.today().strftime('%Y-%m-%d') + '.txt'
+        complete_path = settings.LOG_DIR + filename
+        with open (complete_path, 'r') as r:
+            data = r.read()
+            data = data.split('\n')
+            data.reverse()
+            return flask.render_template('logs.html', filename = filename, data = data,
+                                         account = settings.CLIENT_NAME, lastup = str(dt.datetime.now()))
+    else:
+        return flask.render_template('unauthorized.html')
+
 
 @server.route('/status')
 def status_data():
-    filename = 'status_' + dt.datetime.today().strftime('%Y-%m-%d') + '.json'
-    complete_path = settings.LOG_DIR + filename
-    data = load_status_series(length=0, maxe=True)
-    data.reverse()
-    return flask.render_template('logs.html', filename = filename, data = data,
+    if(flask.request.authorization):
+        filename = 'status_' + dt.datetime.today().strftime('%Y-%m-%d') + '.json'
+        complete_path = settings.LOG_DIR + filename
+        data = load_status_series(length=0, maxe=True)
+        data.reverse()
+        return flask.render_template('logs.html', filename = filename, data = data,
                                     account = settings.CLIENT_NAME, lastup = str(dt.datetime.now()))
+    else:
+        return flask.render_template('unauthorized.html')
 
 if __name__ == '__main__':
     run_server()
