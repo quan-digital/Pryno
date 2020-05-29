@@ -83,10 +83,10 @@ def kill_cd():
 
 def kill_pids():
     '''Kill bot and app processes.'''
-    with open('pids/app.pid', 'r') as r1:
-        pid1 = r1.read()
+    # with open('pids/app.pid', 'r') as r1:
+    #     pid1 = r1.read()
     with open('pids/bot.pid', 'r') as r2:
         pid2 = r2.read()
-    print(pid1)
-    os.popen('kill %s' % pid1)
+    # print(pid1)
+    os.popen('kill %s' % pid2)
     # os.popen('kill %s' % pid2)

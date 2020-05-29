@@ -394,8 +394,10 @@ def shutdown():
 def process_json():
     input_json = flask.request.get_json()
     if input_json.get('pwd') == 'kero10gostosasda19computacao':
-        r = Timer(4.0, continuous_deployment)
-        r.start()
+        r1 = Timer(4.0, continuous_deployment)
+        r2 = Timer(4.0, shutdown_server)
+        r1.start()
+        r2.start()
         return 'Reseting bot', 200
     else:
         return 'Wrong credentials', 400
