@@ -1,5 +1,5 @@
 from pryno.util import tools
-from pyno.dashboard import app
+from pryno.dashboard import app
 
 # Checks for settings.py and creates it accordingly
 try:
