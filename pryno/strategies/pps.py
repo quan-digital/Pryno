@@ -260,7 +260,7 @@ class PPS:
                 telegram_bot.send_group_message(msg =mailMessage)
                 #mail.send_email(mailMessage)
         else:
-            telegram_bot.send_group_message(msg ='✅ No position and no open orders, bot is shutting down')
+            telegram_bot.send_group_message(msg ='✅ No position and no open orders, bot is shutting down for {0}'.format(settings.CLIENT_NAME))
         # os.popen('killall python3')
         # sys.exit(0)
 
