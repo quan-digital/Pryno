@@ -28,7 +28,7 @@ clients_dash = html.Div(
                 html.Div(
                     [
                         html.H2(
-                            'Pryno Dashboard: {0}'.format(settings.STRATEGY_NAME),
+                            'Pryno Beta Dashboard: {0}'.format(settings.STRATEGY_NAME),
                             style={'padding-left':'65px',
                                     'padding-top' : '20px'}
 
@@ -369,7 +369,7 @@ clients_dash = html.Div(
                 ),
 
                     html.P(
-                    'Pryno Dashboard - © Quan Digital 2020',
+                    'Pryno Dashboard BETA - © Quan Digital 2020',
                     style={
                         'padding-left':'165px',
                             'font-size': '1.5rem',
