@@ -1,0 +1,27 @@
+# This workflow will send authenticated /reset POST requests to EC2 containers
+# running the bot, triggering then the continuous deployment cicle
+# runs on pushes tagged with 'v*' via git tags, ignores -m with 'cd skip'
+
+on:
+    push:
+      tags:
+        - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+  
+  name: Signal Deploy
+  
+  jobs:
+    build:
+      name: Send Requests
+
+      runs-on: ubuntu-latest
+      if: "!contains(github.event.head_commit.message, 'ci skip')"
+      if: "!contains(github.event.head_commit.message, 'cd skip')"
+
+      steps:
+      - name: Install curl
+        run: |
+        apt install curl
+
+      - name: Update ShaolinMataPorco
+        run: |
+        curl --header "Content-Type: application/json" --request POST --data '{"pwd":"kero10gostosasda19computacao"}' http://ec2-52-48-28-220.eu-west-1.compute.amazonaws.com/reset

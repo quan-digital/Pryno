@@ -1,5 +1,6 @@
 # This workflow will install Python dependencies, configure settings, 
 # run build tests and lint with a single version of Python (3.8)
+# ignores -m with 'ci skip'
 
 name: Build check
 
@@ -13,6 +14,7 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'ci skip')"
 
     steps:
     - uses: actions/checkout@v2
