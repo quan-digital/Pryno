@@ -1,0 +1,19 @@
+# This action checks if gihub services are up
+# https://www.githubstatus.com/
+
+name: Check Github
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Check GitHub Status
+        uses: crazy-max/ghaction-github-status@v1
+        with:
+          overall_threshold: minor
+          pages_threshold: partial_outage
+      -
+        name: Checkout
+        uses: actions/checkout@v2
