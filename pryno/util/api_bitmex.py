@@ -155,7 +155,7 @@ class BitMEX(object):
         # Generate a unique clOrdID with our prefix so we can identify it.
         if(target == ''):
             if type_order == 'Stop':  
-                clOrdID = self.orderIDPrefix + '_Stm' + side[0] + base64.b64encode(uuid.uuid4().bytes).decode('utf8').rstrip('=\n')
+                clOrdID = self.orderIDPrefix + settings.STM_INDICATOR + side[0] + base64.b64encode(uuid.uuid4().bytes).decode('utf8').rstrip('=\n')
                 postdict = {
                     'symbol': self.symbol,
                     'orderQty': quantity,
@@ -173,7 +173,7 @@ class BitMEX(object):
                     'clOrdID': clOrdID,
                     'ordType': type_order
                 }
-            else: 
+            else:
                 clOrdID = self.orderIDPrefix + base64.b64encode(uuid.uuid4().bytes).decode('utf8').rstrip('=\n')
                 postdict = {
                     'symbol': self.symbol,
@@ -183,10 +183,9 @@ class BitMEX(object):
                     'ordType': type_order
                 }
 
-            
-            
+
         else:
-            clOrdID = self.orderIDPrefix + '_Tgt' + target[0] + base64.b64encode(uuid.uuid4().bytes).decode('utf8').rstrip('=\n')
+            clOrdID = self.orderIDPrefix + settings.TGT_INDICATOR + target[0] + base64.b64encode(uuid.uuid4().bytes).decode('utf8').rstrip('=\n')
             postdict = {
                 'symbol': self.symbol,
                 'orderQty': quantity,
@@ -195,8 +194,8 @@ class BitMEX(object):
                 'text': 'Target' + target[0]
             }
 
-
         return self._curl_bitmex(path=endpoint, postdict=postdict, verb="POST", max_retries= settings.ORDER_MAX_RETRIES)
+
 
 
     def format_order(self, quantity, price, orderNumber):
@@ -206,13 +205,13 @@ class BitMEX(object):
 
         if quantity > 0:
             #order['side'] = 'Buy'
-            Sufix = 'Buy'
+            Sufix = settings.BUY_INDICATOR
         else:
             #order['side'] = 'Sell'
-            Sufix = 'Sel'
+            Sufix = settings.SELL_INDICATOR
 
         # Generate a unique clOrdID with our prefix so we can identify it.
-        clOrdID = self.orderIDPrefix + '_' + Sufix + str(orderNumber) + base64.b64encode(uuid.uuid4().bytes).decode('utf8').rstrip('=\n')
+        clOrdID = self.orderIDPrefix + Sufix + str(orderNumber) + base64.b64encode(uuid.uuid4().bytes).decode('utf8').rstrip('=\n')
         #clOrdID = ''
         postdict = {
             'symbol': self.symbol,
@@ -229,13 +228,13 @@ class BitMEX(object):
         """Amend multiple orders."""
         # Note rethrow; if this fails, we want to catch it and re-tick
         return self._curl_bitmex(path='order/bulk', postdict={'orders': orders}, verb='PUT', rethrow_errors=True)
-    
+
 
     @authentication_required
     def create_bulk_orders(self, orders):
         """Create multiple orders."""
         for order in orders:
-           # order['clOrdID'] = self.orderIDPrefix + base64.b64encode(uuid.uuid4().bytes).decode('utf8').rstrip('=\n')
+        # order['clOrdID'] = self.orderIDPrefix + base64.b64encode(uuid.uuid4().bytes).decode('utf8').rstrip('=\n')
             order['symbol'] = self.symbol
             if self.postOnly:
                 order['execInst'] = 'ParticipateDoNotInitiate'

@@ -144,9 +144,6 @@ VOLUME_TOLERANCE = 10000000
 # Instrument to market make on BitMEX.
 SYMBOL = "XBTUSD"
 
-# Bot name, up to 5 characters
-BOT_NAME = "pryno"
-
 # Strategy name
 BOT_NAME = "PPS"
 
@@ -171,6 +168,19 @@ _PAUSE_BOT = False
 # Project version from setuptools
 BOT_VERSION = str(pkg_resources.require("pryno")[0].version)
 
+STM_INDICATOR = '_Stm'
+TGT_INDICATOR = '_Tgt'
+BUY_INDICATOR = '_Buy'
+SELL_INDICATOR = '_Sel'
+
+#Stop and Buy orders indicators
+STM_INDICATOR_INIT = 0
+GRADLE_INDICATOR_INIT = 0
+STM_INDICATOR_END = 0
+GRADLE_INDICATOR_END = 0
+STM_NUMBER = 0
+GRADLE_NUMBER = 0
+
 #####################################################
 # Mail & Telegram
 #####################################################
@@ -187,6 +197,8 @@ MAIL_ACTIVITY = ['kauecano@gmail.com', 'claudiocarvalhovilasboas@gmail.com','ant
 TOKEN_MAIN_BOT = "1199841211:AAHi1GPjTQJ0dkBTTXSm8zHcQEUzIwBThcs"
 DEBUGGER_BOT = "1242980549:AAHuWBWEo33pViTpHxMeeN97gCs5V7YHDlA"
 DEBUGGER_BOT_GROUP = -459197842
+
+
 
 #####################################################
 # Instance Parameters

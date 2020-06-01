@@ -52,6 +52,12 @@ if __name__ == '__main__':
 		# Build new settings to handle updates
 		configure.create_settings(base_path='config/settings_base.py', config_path='config/config.json', out_path='util/settings.py')
 		settings.VALID_USERNAME_PASSWORD_PAIRS.update({settings.CLIENT_NAME: settings.CLIENT_PWD})
+		settings.STM_INDICATOR_INIT = len(settings.BOT_NAME) + len(settings.BOT_VERSION) + 2
+		settings.GRADLE_INDICATOR_INIT = len(settings.BOT_NAME) + len(settings.BOT_VERSION) + 2
+		settings.STM_INDICATOR_END = len(settings.STM_INDICATOR)+ len(settings.BOT_NAME) + len(settings.BOT_VERSION)+1
+		settings.GRADLE_INDICATOR_END = len(settings.BUY_INDICATOR)+ len(settings.BOT_NAME) + len(settings.BOT_VERSION)+1
+		settings.STM_NUMBER = settings.STM_INDICATOR_INIT + settings.STM_INDICATOR_END
+		settings.GRADLE_NUMBER = settings.GRADLE_INDICATOR_INIT+settings.GRADLE_INDICATOR_END
 		pid = os.getpid()
 		with open('pids/bot.pid', 'w') as w:
 			w.write(str(pid))

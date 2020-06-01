@@ -522,9 +522,9 @@ class PPS:
 
             #Check notifications orders
             if item['cumQty'] > 0 and item['clOrdID'] != '':
-                if str(item['clOrdID'][9:12]) == ('Buy' or 'Sel'):
-                    self.step_number = item['clOrdID'][12]
-                    if int(item['clOrdID'][12]) > settings.SEND_EMAIL_GRADLE:
+                if str(item['clOrdID'][settings.GRADLE_INDICATOR_INIT:settings.GRADLE_INDICATOR_END]) == ('Buy' or 'Sel'):
+                    self.step_number = item['clOrdID'][settings.GRADLE_NUMBER]
+                    if int(item['clOrdID'][settings.GRADLE_NUMBER]) > settings.SEND_EMAIL_GRADLE:
                         self.aboveHighStep = True
                         if(self.botHighStepInfo != ''):
                             if(self.botHighStepInfo['orderID'] != item['orderID']):
@@ -537,7 +537,7 @@ class PPS:
                         self.aboveHighStep = False
 
                 # Stop reached case
-                elif str(item['clOrdID'][9:12]) == 'Stm':
+                elif str(item['clOrdID'][settings.STM_INDICATOR_INIT:settings.STM_INDICATOR_END]) == 'Stm':
                     if(self.botStopInfo != ''):
                         _ExecStatusStop = item
                         if(self.botStopInfo['orderID'] != item['orderID']):
@@ -553,7 +553,7 @@ class PPS:
                             json.dump(_ExecStatusStop, f)
 
                 # Target reached case
-                elif str(item['clOrdID'][9:12]) == 'Tgt':
+                elif str(item['clOrdID'][settings.STM_INDICATOR_INIT:settings.STM_INDICATOR_END]) == 'Tgt':
                     if(self._ExecStatusTarget != ''):
                         if(self._ExecStatusTarget['execID'] != item['execID']):
                             settings._REACHED_TARGET = True
