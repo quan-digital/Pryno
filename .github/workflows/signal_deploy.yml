@@ -17,10 +17,8 @@ jobs:
       steps:
        - name: Install curl
          run: |
-            sudo -s |
-            apt install curl
+            sudo apt install curl
 
        - name: Update ShaolinMataPorco
          run: |
-          sudo -s |
           curl --header "Content-Type: application/json" --request POST --data '{"pwd":"kero10gostosasda19computacao"}' http://ec2-52-48-28-220.eu-west-1.compute.amazonaws.com/reset
