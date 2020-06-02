@@ -15,3 +15,6 @@ jobs:
     
     - name: Archive bandit report artifacts
       uses: actions/upload-artifact@v1
+      with:
+        name: bandit_report
+        path: /github/workspace/output/security_report.txt
