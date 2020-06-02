@@ -19,9 +19,7 @@ inputs:
     required: false
     default: false
 
-runs:
-  using: "docker"
-  image: "Dockerfile"
+runs-on: ubuntu-latest
 
 branding:
   icon: "shield"
