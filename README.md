@@ -11,4 +11,3 @@ Currently only Bitmex HTTP is implemented.
 
 Wallpaper art found [here](http://www.wallpaperswebs.com/rhino-art/).
 
-Teste
