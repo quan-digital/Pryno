@@ -371,6 +371,10 @@ class PPS:
                                 #0.215
                                 if(settings.ISOLATED_MARGIN_FACTOR > 1):
                                     self._contractStep = round(settings.ISOLATED_MARGIN_FACTOR*settings.CONTRACT_PCT*self.actualPrice*tools.XBt_to_XBT(self.available_margin['availableMargin']))/settings.RISK_DIVISOR
+                                    #Specific setup for Mac-10 testing
+                                    if(settings.CLIENT_NAME == 'Tonho'):
+                                        if(self._contractStep < 25):
+                                            self._contractStep = 40
                                 else:
                                     self._contractStep = round(settings.CONTRACT_PCT*self.actualPrice*tools.XBt_to_XBT(self.available_margin['availableMargin']))/settings.RISK_DIVISOR
                                 lastPrice = tools.toNearest(self.actualPrice, self.tickSize)
