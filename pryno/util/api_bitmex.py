@@ -353,6 +353,10 @@ class BitMEX(object):
             delta_amp = None
             self._lastPrice = current_close
 
+        #Disable paramters
+        if(settings.ENABLE_VOLUMAMP == 0):
+            lockAnomaly = False
+
         parameters = {
             'highestPrice': highestPrice,
             'lowestPrice': lowestPrice,

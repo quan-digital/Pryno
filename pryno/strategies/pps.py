@@ -357,7 +357,7 @@ class PPS:
             if(self.operationParameters['average_dollarMinute'] > settings.MIN_DM*settings.ENABLE_VOLUMAMP):
                 if(self.operationParameters['amplitude'] > self.priceStep*2*settings.ENABLE_VOLUMAMP):
                     if(settings.ENABLE_VOLUMAMP == 0):
-                        self.operationParameters['amplitude'] = False
+                        self.operationParameters['lockAnomaly'] = False
                     if(not self.operationParameters['lockAnomaly']):
                         if (self.operationParameters['amplitude']*settings.ENABLE_VOLUMAMP < self.priceStep*10):
                             # Double checking http parameters
