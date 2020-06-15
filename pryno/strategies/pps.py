@@ -590,7 +590,7 @@ class PPS:
             self.logger.info("~: Main Loop :~")
 
             # Operation Parameters Request
-            self.operationParameters = self.exchange.get_operationParameters("XBTUSD",settings.CANDLE_TIME_INTERVAL,"1m")
+            self.operationParameters = self.exchange.get_operationParameters("XBTUSD", settings.CANDLE_TIME_INTERVAL, "1m")
             self.actualPrice = self.operationParameters['lastPrice']
             self.volumeActual = round(self.operationParameters['volume'])
             #telegram_bot.send_group_message('the actual price {} for {}, '.format(self.actualPrice,settings.CLIENT_NAME))		
@@ -661,7 +661,6 @@ class PPS:
                 mailMessage = "⚠️ High step order executed for {0}. Step: {1}. Price: {2}.".format(
                                     settings.CLIENT_NAME,self.step_number,self.botHighStepInfo.get('price',None))
                 telegram_bot.send_group_message(msg =mailMessage)
-                #mail.send_email(mailMessage)
                 settings._HIGH_STEP_ORDER = False
 
             #Notify if client been stopped
@@ -673,12 +672,15 @@ class PPS:
                     initial_balance = checking_alterations['initialBalance']
 
                 loss = (self.available_margin['walletBalance'] - initial_balance)/initial_balance
-                mailMessage = str("Stop order executed for {}".format(settings.CLIENT_NAME))
-                telegram_message = "🛑 Stop order executed for {0}. stopPx: {1}. Percentage lost: {2:.2%}".format(
+                mailMessage = str("Stop order executed for {} couldnt detect the further stop info".format(settings.CLIENT_NAME))
+                if(self.botStopInfo != ''):
+                    telegram_message = "🛑 Stop order executed for {0}. stopPx: {1}. Percentage lost: {2:.2%}".format(
                                     settings.CLIENT_NAME,self.botStopInfo.get("stopPx",None),loss)
+                    telegram_bot.send_group_message(msg =telegram_message)
+                    mail.send_email(telegram_message)
+                else:
+                    mail.send_email(mailMessage)
                 self.logger.info("Stop order executed, halting bot for 1 day.")
-                telegram_bot.send_group_message(msg =mailMessage)
-                mail.send_email(mailMessage)
                 self.exchange.cancel_every_order()
                 sleep(settings._SLEEP_FOR_ONE_DAY)
                 settings._REACHED_STOP = False
@@ -700,7 +702,7 @@ class PPS:
                     elif(self.positionContracts < 0):
                         self.logger.info("Short position found, beginning Buy Target loop.")
                         self.position_loop('Buy')
-                    
+
                     elif(self.positionContracts > 0):
                         self.logger.info("Long position found, beginning Sell Target loop.")
                         self.position_loop('Sell')
@@ -711,7 +713,7 @@ class PPS:
                     raise SystemExit('Not enough funds on account')
 
             self.logger.info("Waiting %d seconds ..." % settings.LOOP_INTERVAL)
-            self._data_dump() # write data to dashboard status
+            self._data_dump()# write data to dashboard status
 
             # If day changes, restart
             res_date = datetime.datetime.today().strftime('%Y-%m-%d')
