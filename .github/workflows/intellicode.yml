@@ -44,5 +44,5 @@ jobs:
       run: |
         export PYTHONPATH=pryno
         pytest
- - name: Train Intellicode Model
+    - name: Train Intellicode Model
        uses: microsoft/vs-intellicode@v1

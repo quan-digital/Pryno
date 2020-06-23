@@ -24,8 +24,10 @@ jobs:
                 args: --recursive --in-place --aggressive --aggressive .
 
             - name: Create PR
-              commit-message: autopep8 action fixes
-              commiter: Pep8
-              title: Fixes by autopep8 action
-              body: This is an wuto-generated PR with fixes by autopep8 GH Action.
-              labels: autopep8, automated pr
+              uses: peter-evans/create-pull-request@v2
+              with:
+                commit-message: autopep8 action fixes
+                commiter: Pep8
+                title: Fixes by autopep8 action
+                body: This is an wuto-generated PR with fixes by autopep8 GH Action.
+                labels: autopep8, automated pr
