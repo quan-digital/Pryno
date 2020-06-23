@@ -1,0 +1,31 @@
+# This workflow will build the project and correct according to autopep8
+# then create a PR
+
+name: Autopep8 PR
+on:
+    push:
+      tags:
+        - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+        - 'pep'
+
+jobs:
+    autopep8:
+        runs-on: ubuntu-latest
+        if: "!contains(github.event.head_commit.message, 'cd skip' // 'release skip')"
+
+        steps:
+
+            - name: Checkout code
+              uses: actions/checkout@v2
+
+            - name: autopep8
+              uses: peter-evans/autopep8
+              with:
+                args: --recursive --in-place --aggressive --aggressive .
+
+            - name: Create PR
+              commit-message: autopep8 action fixes
+              commiter: Pep8
+              title: Fixes by autopep8 action
+              body: This is an wuto-generated PR with fixes by autopep8 GH Action.
+              labels: autopep8, automated pr

@@ -1,3 +1,4 @@
+# DISABLED
 # runs https://github.com/Joel-hanson/bandit-report-artifacts security routine
 
 name: Bandit Security

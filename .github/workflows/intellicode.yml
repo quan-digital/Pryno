@@ -1,0 +1,48 @@
+# This workflow will install build the project and train an Intellicode
+# completion model on it
+
+name: Intellicode
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'ci skip')"
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        pip install -r requirements.txt
+        pip install -e .
+    - name: Lint with flake8
+      run: |
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Setup config
+      run: |
+        cd pryno/config
+        cp config_tonho5.json config.json
+        python -c 'import configure; configure.create_settings()'
+        cd ../..
+    - name: Test with pytest
+      run: |
+        export PYTHONPATH=pryno
+        pytest
+ - name: Train Intellicode Model
+       uses: microsoft/vs-intellicode@v1
