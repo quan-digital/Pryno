@@ -7,6 +7,10 @@ The ultimate crypto bot dev package - Trading Infrastructure + Dashboard + Teleg
 
 Currently only Bitmex HTTP is implemented.
 
+## Actions
+
+Tons of awesome Github Actions integrated.
+
 ## Disclosure
 
 Wallpaper art found [here](http://www.wallpaperswebs.com/rhino-art/).
