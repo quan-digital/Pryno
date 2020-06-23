@@ -9,7 +9,7 @@ Currently only Bitmex HTTP is implemented.
 
 ## Actions
 
-Tons of awesome Github Actions integrated.
+Tons of awesome Github Actions integrated. Autopep
 
 ## Disclosure
 
