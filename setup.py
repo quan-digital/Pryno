@@ -21,7 +21,8 @@ setup(name='pryno',
         'dash-auth==1.3.2',
         'dash-core-components==1.9.1',
         'python-telegram-bot==12.7',
-        'pymongo==3.10.1'
+        'pymongo==3.10.1',
+        'dnspython==1.16.0'
       ],
       packages=find_packages(),
       )

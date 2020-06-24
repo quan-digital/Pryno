@@ -3,6 +3,13 @@
 # - Pryno Position Strategy -
 # * Quan.digital *
 
+import pryno.telegram_bot.quan_bot as telegram_bot
+from pryno.database.mongo import RyngoDB
+from pryno.util.api_bitmex import BitMEX
+from pryno.util import settings
+from pryno.util import mail
+from pryno.util import tools
+from pryno.util import logger
 from time import sleep
 import datetime
 import sys
@@ -12,12 +19,7 @@ import random
 import atexit
 import traceback
 import json
-import pryno.util.mail as mail
-import pryno.util.tools as tools
-import pryno.util.settings as settings
-import pryno.telegram_bot.quan_bot as telegram_bot
-from pryno.util.api_bitmex import BitMEX
-from pryno.util import logger
+
 
 # Used for reloading the bot - saves modified times of key files
 watched_files_mtimes = [(f, getmtime(f)) for f in settings.WATCHED_FILES]
