@@ -3,7 +3,7 @@
 # - Settings -
 # * Quan.digital *
 
-import pkg_resources  
+import pkg_resources
 
 # API URL
 BASE_URL = "https://testnet.bitmex.com/api/v1/"
@@ -23,26 +23,28 @@ BITMEX_SECRET = ""
 #####################################################
 
 # Number of steps with lower price step
-LOW_RISK_ORDER = 4  
-MEDIUM_RISK_ORDER= 11
+LOW_RISK_ORDER = 4
+MEDIUM_RISK_ORDER = 11
 ORDER_INCREASE_INTERVAL = 7
 
-#Contracts Percentual
-CONTRACT_PCT = 1.75/100
-#Activate Fixed Margin
+# Contracts Percentual
+CONTRACT_PCT = 1.75 / 100
+# Activate Fixed Margin
 FIXED_MARGIN_FLAG = False
 ISOLATED_MARGIN_FACTOR = 5
-#Margin funds percentual to get for amount of contracts as steps increases, for dynamic contract steps 
+# Margin funds percentual to get for amount of contracts as steps
+# increases, for dynamic contract steps
 SMALL_CONTRACT = 0.215
 MEDIUM_CONTRACT = 0.2375
-LARGE_CONTRACT = 0.3 
-# Enable=1 or disable=0 volume profile and amplitude 
+LARGE_CONTRACT = 0.3
+# Enable=1 or disable=0 volume profile and amplitude
 ENABLE_VOLUMAMP = 1
 MIN_DM = 1450000
 MIN_DM_CANCEL = 800000
 MAX_VOLUME = 11450000
 
-# Set FIXED_STEP to None if you want to use limits, otherwise specify an integer
+# Set FIXED_STEP to None if you want to use limits, otherwise specify an
+# integer
 FIXED_STEP = 30
 MIN_STEP = 20
 MAX_STEP = 40
@@ -95,19 +97,19 @@ DASH_INTERVAL = 10
 
 # Authentication
 VALID_USERNAME_PASSWORD_PAIRS = {
-    'claudin':'cafefrio',
-    'kaue':'greekgod',
-    'antonio':'gayragnar',
-    'xande':'bumbumza1',
-    'pynoclient' : 'capile123'
+    'claudin': 'cafefrio',
+    'kaue': 'greekgod',
+    'antonio': 'gayragnar',
+    'xande': 'bumbumza1',
+    'pynoclient': 'capile123'
 
 }
 
 ADMIN_USERS = {
-    'claudin':'cafefrio',
-    'kaue':'greekgod',
-    'antonio':'gayragnar',
-    'xande':'bumbumza1',
+    'claudin': 'cafefrio',
+    'kaue': 'greekgod',
+    'antonio': 'gayragnar',
+    'xande': 'bumbumza1',
 }
 
 
@@ -115,7 +117,8 @@ ADMIN_USERS = {
 # API
 #####################################################
 
-# Sets postOnly order type, guarantees fee rebate but risks not being fulfilled right away
+# Sets postOnly order type, guarantees fee rebate but risks not being
+# fulfilled right away
 POST_ONLY = False
 
 # Time interval to analyse candles
@@ -151,17 +154,17 @@ BOT_NAME = "PPS"
 LOG_DIR = 'logs/'
 
 # Max file size in bytes
-MAX_FILE_SIZE = 100000000 # 100MB
+MAX_FILE_SIZE = 100000000  # 100MB
 
-#path/to/financedir
+# path/to/financedir
 FIN_DIR = 'fin/'
 
 # Numbers of seconds in a day
 _SLEEP_FOR_ONE_DAY = 86400
 
 _HIGH_STEP_ORDER = False
-_REACHED_STOP  = False
-_REACHED_TARGET  = False
+_REACHED_STOP = False
+_REACHED_TARGET = False
 
 _PAUSE_BOT = False
 
@@ -173,7 +176,7 @@ TGT_INDICATOR = '_Tgt'
 BUY_INDICATOR = '_Buy'
 SELL_INDICATOR = '_Sel'
 
-#Stop and Buy orders indicators
+# Stop and Buy orders indicators
 STM_INDICATOR_INIT = 0
 GRADLE_INDICATOR_INIT = 0
 STM_INDICATOR_END = 0
@@ -191,16 +194,18 @@ BOT_PWD = "SurubaoParaiso123"
 
 # Email receipients
 MAIL_TO_ERROR = ['kauecano@gmail.com', 'claudiocarvalhovilasboas@gmail.com']
-MAIL_ACTIVITY = ['kauecano@gmail.com', 'claudiocarvalhovilasboas@gmail.com','antoniodelimaesilva@gmail.com','alexandre.c.bandarra01@gmail.com']
+MAIL_ACTIVITY = [
+    'kauecano@gmail.com',
+    'claudiocarvalhovilasboas@gmail.com',
+    'antoniodelimaesilva@gmail.com',
+    'alexandre.c.bandarra01@gmail.com']
 
-#Telegram Bots Token
+# Telegram Bots Token
 TOKEN_MAIN_BOT = "1199841211:AAHi1GPjTQJ0dkBTTXSm8zHcQEUzIwBThcs"
 DEBUGGER_BOT = "1242980549:AAHuWBWEo33pViTpHxMeeN97gCs5V7YHDlA"
 DEBUGGER_BOT_GROUP = -459197842
 
 
-
 #####################################################
 # Instance Parameters
 #####################################################
-

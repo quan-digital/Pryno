@@ -43,7 +43,7 @@ THREADED_RUN = True
 # Make 80 for AWS EC2, default is 5000
 PORT = 80
 
-#Is resetting
+# Is resetting
 is_resetting = False
 
 # Make 0.0.0.0 to IP redirect, default is 127.0.0.1
@@ -89,7 +89,7 @@ layout = dict(
 app.layout = client_dash.clients_dash
 
 # -----------------------------------------------------------------------------------------
-# ----------------------Data Load Functions------------------------------------------------
+# ----------------------Data Load Functions-------------------------------
 # -----------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------
 
@@ -100,7 +100,7 @@ def load_exec():
         with open(settings.LOG_DIR + 'exec_' + today + '.csv', "r") as handler:
             execs = csv.reader(handler)
             execs = list(execs)
-    except:
+    except BaseException:
         print('No executions so far...')
         execs = {}
     return execs
@@ -112,7 +112,7 @@ def load_errors():
         with open(settings.LOG_DIR + 'errors_' + today + '.csv', "r") as handler:
             errors = csv.reader(handler)
             errors = list(errors)
-    except:
+    except BaseException:
         print('No errors so far...')
         errors = {}
     return errors
@@ -123,8 +123,18 @@ def load_orders():
     try:
         with open(settings.LOG_DIR + 'orders_' + today + '.csv', "r") as handler:
             orders = csv.reader(handler)
-            orders = [str(o[1] + " " + o[5] + " " + o[6] + " " + o[7] + " " + o[8] + " " + o[9][:14]) for o in list(orders)]
-    except:
+            orders = [str(o[1] +
+                          " " +
+                          o[5] +
+                          " " +
+                          o[6] +
+                          " " +
+                          o[7] +
+                          " " +
+                          o[8] +
+                          " " +
+                          o[9][:14]) for o in list(orders)]
+    except BaseException:
         orders = {}
     return orders
 
@@ -141,7 +151,8 @@ def load_status_series(length=1, maxe=False, last=False):
     with open(settings.LOG_DIR + 'status_' + today + '.json', "r") as handler:
         unhandled_json = handler.read()
 
-    # Due to the last comma, the actual last entry [-1] is null, so we get the one before that
+    # Due to the last comma, the actual last entry [-1] is null, so we get the
+    # one before that
     if length == 1:
         unhandled_json = str(unhandled_json.split('\n')[-2])
         unhandled_json = unhandled_json[:-1]
@@ -149,15 +160,33 @@ def load_status_series(length=1, maxe=False, last=False):
         unhandled_json = ''.join(('[', unhandled_json, ']'))
     # For time series, we do some serious mangling, but we get there
     elif maxe:
-        unhandled_json = str(unhandled_json.split('\n')[0:-2]).replace("'", "").replace(",,", ",").replace("},]", "}]")
+        unhandled_json = str(
+            unhandled_json.split('\n')[
+                0:-
+                2]).replace(
+            "'",
+            "").replace(
+                ",,",
+                ",").replace(
+                    "},]",
+            "}]")
     elif last:
         unhandled_json = str(unhandled_json.split('\n')[0])
         unhandled_json = unhandled_json[:-1]
         # Wraps [] to json core
         unhandled_json = ''.join(('[', unhandled_json, ']'))
     else:
-        cutLength = -(length+2)
-        unhandled_json = str(unhandled_json.split('\n')[cutLength:-2]).replace("'", "").replace(",,", ",").replace("},]", "}]")
+        cutLength = -(length + 2)
+        unhandled_json = str(
+            unhandled_json.split('\n')[
+                cutLength:-
+                2]).replace(
+            "'",
+            "").replace(
+                ",,",
+                ",").replace(
+                    "},]",
+            "}]")
 
     # Transforms string to actual json
     handled_json = json.loads(unhandled_json)
@@ -176,7 +205,7 @@ def get_profit():
     '''Basic Profit calculation.'''
     initBalance = load_initial_balance()
     lastBalance = load_status()['balance']
-    return "{:.2%}".format(((lastBalance - initBalance)/initBalance))
+    return "{:.2%}".format(((lastBalance - initBalance) / initBalance))
 
 
 def get_stop_order(orders):
@@ -192,7 +221,7 @@ def get_stop_order(orders):
         return 0
 
 # -----------------------------------------------------------------------------------------
-# --------------------Dash Callback Functions----------------------------------------------
+# --------------------Dash Callback Functions-----------------------------
 # -----------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------
 
@@ -239,7 +268,7 @@ def update_metrics(n):
         statusData['volume'] if settings.DEBUG_DASH else statusData['funding_rate'],
         statusData['amplitude'] if settings.DEBUG_DASH else statusData['leverage'],
         statusData['dollar_minute'] if settings.DEBUG_DASH else statusData['avg_entry_price'],
-        str(statusData['lock_anomaly']) if settings.DEBUG_DASH else [statusData['ask_price'] - statusData['bid_price']],    
+        str(statusData['lock_anomaly']) if settings.DEBUG_DASH else [statusData['ask_price'] - statusData['bid_price']],
         round(tools.XBt_to_XBT(statusData['balance']), 4),
         round(tools.XBt_to_XBT(statusData['available_margin']), 4)
     ]
@@ -297,9 +326,12 @@ def make_btc_figure(n):
 
 @app.callback(dash.dependencies.Output('pause_message', 'children'),
               [dash.dependencies.Input('pause_button', 'n_clicks'),
-              dash.dependencies.Input('pause_confirm', 'cancel_n_clicks_timestamp'),
-              dash.dependencies.Input('pause_confirm', 'submit_n_clicks_timestamp')])
-def update_output(n_clicks, cancel_n_clicks_timestamp, submit_n_clicks_timestamp):
+               dash.dependencies.Input('pause_confirm', 'cancel_n_clicks_timestamp'),
+               dash.dependencies.Input('pause_confirm', 'submit_n_clicks_timestamp')])
+def update_output(
+        n_clicks,
+        cancel_n_clicks_timestamp,
+        submit_n_clicks_timestamp):
     '''Bot operation button handling.'''
     username = flask.request.authorization['username']
     if not(cancel_n_clicks_timestamp):
@@ -310,12 +342,12 @@ def update_output(n_clicks, cancel_n_clicks_timestamp, submit_n_clicks_timestamp
         if username in settings.ADMIN_USERS:
             if submit_n_clicks_timestamp > cancel_n_clicks_timestamp:
                 with open(settings.LOG_DIR + 'operation.json', 'w') as op:
-                    json.dump(dict(operation = True), op)
+                    json.dump(dict(operation=True), op)
                 settings._PAUSE_BOT = False
                 return
             else:
                 with open(settings.LOG_DIR + 'operation.json', 'w') as op:
-                    json.dump(dict(operation = False), op)
+                    json.dump(dict(operation=False), op)
                 settings._PAUSE_BOT = True
                 return
         else:
@@ -325,11 +357,11 @@ def update_output(n_clicks, cancel_n_clicks_timestamp, submit_n_clicks_timestamp
 
 
 @app.callback([dash.dependencies.Output('html_p1', 'children'),
-    dash.dependencies.Output('html_p2', 'children'),
-    dash.dependencies.Output('html_p3', 'children'),
-    dash.dependencies.Output('html_p4', 'children'),
-    dash.dependencies.Output('html_p5', 'children')],
-    [Input('interval-component', 'n_intervals')])
+               dash.dependencies.Output('html_p2', 'children'),
+               dash.dependencies.Output('html_p3', 'children'),
+               dash.dependencies.Output('html_p4', 'children'),
+               dash.dependencies.Output('html_p5', 'children')],
+              [Input('interval-component', 'n_intervals')])
 def check_user_privilege(n):
     '''Check user admin level and render dashboard accordingly.'''
     username = flask.request.authorization['username']
@@ -350,7 +382,7 @@ def check_user_privilege(n):
     return [html_p1, html_p2, html_p3, html_p4, html_p5]
 
 
-@app.callback([dash.dependencies.Output('button_name','children')],
+@app.callback([dash.dependencies.Output('button_name', 'children')],
               [Input('interval-component', 'n_intervals')])
 def check_button_user(n):
     '''Check user admin level and render run button accordingly.'''
@@ -362,7 +394,7 @@ def check_button_user(n):
     return [bn]
 
 # -----------------------------------------------------------------------------------------
-# ----------------------- Server Functions ------------------------------------------------
+# ----------------------- Server Functions -------------------------------
 # -----------------------------------------------------------------------------------------
 # -----------------------------------------------------------------------------------------
 
@@ -374,7 +406,11 @@ def run_server():
     print(response)
     with open('pids/app.pid', 'w') as w:
         w.write(str(pid))
-    app.server.run(host=HOST, port=PORT, debug=settings.DEBUG_DASH, threaded=THREADED_RUN)
+    app.server.run(
+        host=HOST,
+        port=PORT,
+        debug=settings.DEBUG_DASH,
+        threaded=THREADED_RUN)
 
 
 def shutdown_server():
@@ -408,12 +444,17 @@ def api_data():
     if(flask.request.authorization):
         filename = 'api_' + dt.datetime.today().strftime('%Y-%m-%d') + '.txt'
         complete_path = settings.LOG_DIR + filename
-        with open (complete_path, 'r') as r:
+        with open(complete_path, 'r') as r:
             data = r.read()
             data = data.split('\n')
             data.reverse()
-            return flask.render_template('logs.html', filename = filename, data = data,
-                                         account = settings.CLIENT_NAME, lastup = str(dt.datetime.now()))
+            return flask.render_template(
+                'logs.html',
+                filename=filename,
+                data=data,
+                account=settings.CLIENT_NAME,
+                lastup=str(
+                    dt.datetime.now()))
     else:
         return flask.render_template('unauthorized.html')
 
@@ -423,26 +464,37 @@ def error_data():
     if(flask.request.authorization):
         filename = 'errors_' + dt.datetime.today().strftime('%Y-%m-%d') + '.txt'
         complete_path = settings.LOG_DIR + filename
-        with open (complete_path, 'r') as r:
+        with open(complete_path, 'r') as r:
             data = r.read()
             data = str(data).split('\n')
             data.reverse()
-            return flask.render_template('logs.html', filename = filename, data = data,
-                                     account = settings.CLIENT_NAME, lastup = str(dt.datetime.now()))
+            return flask.render_template(
+                'logs.html',
+                filename=filename,
+                data=data,
+                account=settings.CLIENT_NAME,
+                lastup=str(
+                    dt.datetime.now()))
     else:
         return flask.render_template('unauthorized.html')
+
 
 @server.route('/subsonicevilneedle')
 def pps_data():
     if(flask.request.authorization):
         filename = 'pps_' + dt.datetime.today().strftime('%Y-%m-%d') + '.txt'
         complete_path = settings.LOG_DIR + filename
-        with open (complete_path, 'r') as r:
+        with open(complete_path, 'r') as r:
             data = r.read()
             data = data.split('\n')
             data.reverse()
-            return flask.render_template('logs.html', filename = filename, data = data,
-                                         account = settings.CLIENT_NAME, lastup = str(dt.datetime.now()))
+            return flask.render_template(
+                'logs.html',
+                filename=filename,
+                data=data,
+                account=settings.CLIENT_NAME,
+                lastup=str(
+                    dt.datetime.now()))
     else:
         return flask.render_template('unauthorized.html')
 
@@ -454,10 +506,16 @@ def status_data():
         complete_path = settings.LOG_DIR + filename
         data = load_status_series(length=0, maxe=True)
         data.reverse()
-        return flask.render_template('logs.html', filename = filename, data = data,
-                                    account = settings.CLIENT_NAME, lastup = str(dt.datetime.now()))
+        return flask.render_template(
+            'logs.html',
+            filename=filename,
+            data=data,
+            account=settings.CLIENT_NAME,
+            lastup=str(
+                dt.datetime.now()))
     else:
         return flask.render_template('unauthorized.html')
+
 
 if __name__ == '__main__':
     run_server()

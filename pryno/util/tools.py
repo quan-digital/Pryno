@@ -14,7 +14,7 @@ def XBt_to_XBT(XBt):
 
 
 def toNearest(num, tickSize=0.5):
-    '''Given a number, round it to the nearest tick. 
+    '''Given a number, round it to the nearest tick.
     Use this after adding/subtracting/multiplying numbers.
     More reliable than round().'''
     tickDec = Decimal(str(tickSize))

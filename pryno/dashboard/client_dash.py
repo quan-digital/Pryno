@@ -28,25 +28,26 @@ clients_dash = html.Div(
                 html.Div(
                     [
                         html.H2(
-                            'Pryno Beta Dashboard: {0}'.format(settings.STRATEGY_NAME),
-                            style={'padding-left':'65px',
-                                    'padding-top' : '20px'}
+                            'Pryno Beta Dashboard: {0}'.format(
+                                settings.STRATEGY_NAME),
+                            style={'padding-left': '65px',
+                                   'padding-top': '20px'}
 
                         ),
                         html.H5(
                             'Account: {0}'.format(settings.CLIENT_NAME),
-                            style={'padding-left':'65px',
-                                    'font-size': '1.5rem'}
+                            style={'padding-left': '65px',
+                                   'font-size': '1.5rem'}
                         ),
                         html.H5(
-                            id = 'status',
-                            style={'padding-left':'65px',
-                                    'font-size': '1.5rem'}
+                            id='status',
+                            style={'padding-left': '65px',
+                                   'font-size': '1.5rem'}
                         ),
                         html.H5(
-                            id = 'timestamp',
-                            style={'padding-left':'65px',
-                                    'font-size': '1.5rem'}
+                            id='timestamp',
+                            style={'padding-left': '65px',
+                                   'font-size': '1.5rem'}
                         ),
                     ],
 
@@ -54,25 +55,25 @@ clients_dash = html.Div(
                 ),
                 dcc.ConfirmDialogProvider(
                     children=html.A(
-                    html.Button(
-                        html.H5(
+                        html.Button(
+                            html.H5(
 
-                            id = 'button_name',
-                            className="info_text",
-                            style={'padding-left':'0px',
-                                    'font-size': '1.0rem'}
+                                id='button_name',
+                                className="info_text",
+                                style={'padding-left': '0px',
+                                       'font-size': '1.0rem'}
+                            ),
+                            id="pause_button"
                         ),
-                        id="pause_button"
+                        className="two columns"
+
                     ),
-                    className="two columns"
-                    
-                ),
                     message="Press 'OK' to run bot, and 'Cancel' to pause operation",
                     id='pause_confirm'
-                    ),
+                ),
                 html.Div(id='pause_message',
-                    children= "",
-                    style={'text-align': 'center'}),
+                         children="",
+                         style={'text-align': 'center'}),
                 html.Img(
                     src="assets/logo-light.png",
                     className='two columns',
@@ -101,7 +102,7 @@ clients_dash = html.Div(
                                 html.P("Open Orders"),
                                 html.H6(
                                     className="info_text",
-                                    id = "open_orders",
+                                    id="open_orders",
                                     style={'whiteSpace': 'pre-wrap'}
                                 )
                             ],
@@ -111,7 +112,7 @@ clients_dash = html.Div(
                     className="pretty_container four columns"
                 ),
                 html.Div(
-                    [   
+                    [
                         # First info row
                         html.Div(
                             [
@@ -210,7 +211,7 @@ clients_dash = html.Div(
                                 html.Div(
                                     [
                                         html.P(
-                                        	id="html_p1",
+                                            id="html_p1",
                                             className="info_text"),
                                         html.H6(
                                             id="volume",
@@ -224,7 +225,7 @@ clients_dash = html.Div(
                                 html.Div(
                                     [
                                         html.P(
-                                        	id="html_p2",
+                                            id="html_p2",
                                             className="info_text"),
                                         html.H6(
                                             id="amplitude",
@@ -238,7 +239,7 @@ clients_dash = html.Div(
                                 html.Div(
                                     [
                                         html.P(id="html_p3",
-                                            className="info_text"),
+                                               className="info_text"),
                                         html.H6(
                                             id="dolmin",
                                             className="info_text"
@@ -251,7 +252,7 @@ clients_dash = html.Div(
                                 html.Div(
                                     [
                                         html.P(id="html_p4",
-                                            className="info_text"),
+                                               className="info_text"),
                                         html.H6(
                                             id="lockAnom",
                                             className="info_text"
@@ -296,96 +297,97 @@ clients_dash = html.Div(
                                 html.P("BTC Price @ Bitmex"),
                                 dcc.Graph(
                                     figure={
-                                    'layout': go.Layout(
-                                        paper_bgcolor='rgba(0,0,0,0)',
-                                        plot_bgcolor='rgba(0,0,0,0)'
-                                    )},
+                                        'layout': go.Layout(
+                                            paper_bgcolor='rgba(0,0,0,0)',
+                                            plot_bgcolor='rgba(0,0,0,0)'
+                                        )},
                                     id='count_graph',
                                 )
                             ],
                             id="countGraphContainer",
                             className="pretty_container",
-                            style=dict(minHeight= "250px")
+                            style=dict(minHeight="250px")
                         )
                     ],
                     id="rightCol",
                     className="eight columns"
                 )
             ],
-            id = 'upper_info',
+            id='upper_info',
             className="row"
         ),
 
 
         # Bottom components (executions and errors)
-         html.Div(
+        html.Div(
             [
-            html.Div(
-                [
-                    html.P("Executions"),
-                    html.H6(
-                        id="executions",
-                        className="info_text",
-                        style={'whiteSpace': 'pre-wrap'}
-                    )
-                ],
-                id="",
-                className="pretty_container",
-                style=dict(overflow="scroll", maxHeight= "550px")
-                
-            ),
-            html.Div(
-                [
-                    html.P(
-                    	id = "html_p5",
-                    	className="info_text",
-                    	style={'whiteSpace': 'pre-wrap'}),
-                    html.H6(
-                        id="errors",
-                        className="info_text",
-                        style={'whiteSpace': 'pre-wrap'}
-                    )
-                ],
-                id="",
-                className="pretty_container",
-                style=dict(overflow="scroll", maxHeight= "550px")
-            ),
-             ],
-             id = 'lower_info',
-             className='row'
-         ),
-
-                # Footer
                 html.Div(
                     [
-                    html.P(
+                        html.P("Executions"),
+                        html.H6(
+                            id="executions",
+                            className="info_text",
+                            style={'whiteSpace': 'pre-wrap'}
+                        )
+                    ],
+                    id="",
+                    className="pretty_container",
+                    style=dict(overflow="scroll", maxHeight="550px")
+
+                ),
+                html.Div(
+                    [
+                        html.P(
+                            id="html_p5",
+                            className="info_text",
+                            style={'whiteSpace': 'pre-wrap'}),
+                        html.H6(
+                            id="errors",
+                            className="info_text",
+                            style={'whiteSpace': 'pre-wrap'}
+                        )
+                    ],
+                    id="",
+                    className="pretty_container",
+                    style=dict(overflow="scroll", maxHeight="550px")
+                ),
+            ],
+            id='lower_info',
+            className='row'
+        ),
+
+        # Footer
+        html.Div(
+            [
+                html.P(
                     'Designed by canokaue & claudiovb',
                     style={
-#                          'padding-left':'65px',
-                            'font-size': '1.5rem',
-                            'color': '#b5c6cc',
-                            'align': 'left',
-                            }
+                        #                          'padding-left':'65px',
+                        'font-size': '1.5rem',
+                        'color': '#b5c6cc',
+                        'align': 'left',
+                    }
                 ),
 
-                    html.P(
-                    'Pryno Dashboard <b>BETA v {0}</b> - © Quan Digital 2020'.format(settings.BOT_VERSION),
+                html.P(
+                    'Pryno Dashboard <b>BETA v {0}</b> - © Quan Digital 2020'.format(
+                        settings.BOT_VERSION),
                     style={
-                        'padding-left':'165px',
-                            'font-size': '1.5rem',
-                            'color': '#b5c6cc',
-                            'align': 'left',
-                            }
+                        'padding-left': '165px',
+                        'font-size': '1.5rem',
+                        'color': '#b5c6cc',
+                        'align': 'left',
+                    }
                 ),
-             ], 
-                      id = 'footer',
-                      className="row"
-          ),
+            ],
+            id='footer',
+            className="row"
+        ),
 
-        # Update loop component 
+        # Update loop component
         dcc.Interval(
             id='interval-component',
-            interval=settings.DASH_INTERVAL*1000, 
+            interval=settings.DASH_INTERVAL * 1000,
             n_intervals=0
         )
     ],

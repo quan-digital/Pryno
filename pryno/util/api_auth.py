@@ -3,9 +3,13 @@
 # - Bitmex API Auth module -
 # * Quan.digital *
 
-import time, urllib, hmac, hashlib
+import time
+import urllib
+import hmac
+import hashlib
 from requests.auth import AuthBase
 import pryno.util.settings as settings
+
 
 def generate_nonce():
     return int(round(time.time() + 3600))
@@ -23,6 +27,7 @@ def generate_nonce():
 # data={"symbol":"XBTZ14","quantity":1,"price":395.01}
 # signature = HEX(HMAC_SHA256(secret, 'POST/api/v1/order1416993995705{"symbol":"XBTZ14","quantity":1,"price":395.01}'))
 
+
 def generate_signature(secret, verb, url, nonce, data):
     """Generate a request signature compatible with BitMEX."""
     # Parse the url so we can remove the base and extract just the path.
@@ -34,8 +39,12 @@ def generate_signature(secret, verb, url, nonce, data):
     # print "Computing HMAC: %s" % verb + path + str(nonce) + data
     message = (verb + path + str(nonce) + data).encode('utf-8')
 
-    signature = hmac.new(secret.encode('utf-8'), message, digestmod=hashlib.sha256).hexdigest()
+    signature = hmac.new(
+        secret.encode('utf-8'),
+        message,
+        digestmod=hashlib.sha256).hexdigest()
     return signature
+
 
 def generate_signature2(secret, verb, url, nonce, data):
     """Generate a request signature compatible with BitMEX."""
@@ -51,8 +60,12 @@ def generate_signature2(secret, verb, url, nonce, data):
     # print "Computing HMAC: %s" % verb + path + str(nonce) + data
     message = verb + path + str(nonce) + data
 
-    signature = hmac.new(bytes(secret, 'utf8'), bytes(message, 'utf8'), digestmod=hashlib.sha256).hexdigest()
+    signature = hmac.new(
+        bytes(
+            secret, 'utf8'), bytes(
+            message, 'utf8'), digestmod=hashlib.sha256).hexdigest()
     return signature
+
 
 class APIKeyAuthWithExpires(AuthBase):
     """Attaches API Key Authentication to the given Request object. This implementation uses `expires`."""
@@ -70,8 +83,10 @@ class APIKeyAuthWithExpires(AuthBase):
         For more details, see https://www.bitmex.com/app/apiKeys
         """
         # modify and return the request
-        expires = int(round(time.time()) + settings.AUTH_EXPIRE_TIME)  # grace period in case of clock skew
+        # grace period in case of clock skew
+        expires = int(round(time.time()) + settings.AUTH_EXPIRE_TIME)
         r.headers['api-expires'] = str(expires)
         r.headers['api-key'] = self.apiKey
-        r.headers['api-signature'] = generate_signature2(self.apiSecret, r.method, r.url, expires, r.body or '')
+        r.headers['api-signature'] = generate_signature2(
+            self.apiSecret, r.method, r.url, expires, r.body or '')
         return r
