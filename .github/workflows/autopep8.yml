@@ -26,5 +26,5 @@ jobs:
                 commit-message: autopep8 action fixes
                 commiter: Pep8
                 title: Fixes by autopep8 action
-                body: This is an wuto-generated PR with fixes by autopep8 GH Action.
+                body: This is an auto-generated PR with fixes by autopep8 GH Action.
                 labels: autopep8, automated pr
