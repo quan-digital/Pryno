@@ -8,7 +8,7 @@ on: push
 jobs:
     autopep8:
         runs-on: ubuntu-latest
-        if: "!contains(github.event.head_commit.message, 'pep8')"
+        if: "contains(github.event.head_commit.message, 'pep8')"
 
         steps:
 
