@@ -42,7 +42,8 @@ class PPS:
         self.wallet_logger = logger.setup_db('wallet')
         self.exec_logger = logger.setup_db('exec_http')
 
-        # Initialize exchange
+        # Initialize DB & exchange
+        self.mongo_client = RyngoDB()
         self.symbol = settings.SYMBOL
         self.exchange = BitMEX(base_url=bitmex_url,
                 symbol=self.symbol, apiKey=settings.BITMEX_KEY, apiSecret=settings.BITMEX_SECRET)
@@ -147,6 +148,8 @@ class PPS:
         current_status_path = settings.LOG_DIR + 'current_status.json'
         with open(current_status_path, 'w') as f:
             json.dump(status_dict, f)
+        self.mongo_client.insert_status(status_dict)
+        print('MONGO GONGO BONGO')
         return
 
     def _profit_check(self):
