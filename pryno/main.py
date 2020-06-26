@@ -16,7 +16,7 @@ except:
 
 from pryno.config import configure
 from pryno.util import tools, logger
-from pryno.strategies import pps
+from pryno.strategies import pps, carlao_strategy
 from pryno.dashboard import app
 
 
@@ -62,10 +62,13 @@ if __name__ == '__main__':
 		with open('pids/bot.pid', 'w') as w:
 			w.write(str(pid))
 		mm = pps.PPS(settings.BASE_URL)
+		# cs = carlao_strategy.Carlao_Strategy(settings.BASE_URL)
 		Thread(target=app.run_server).start()
+		#cs.run_loop()
 		mm.run_loop()
 	except (KeyboardInterrupt, SystemExit):
 		# mm.exchange.cancel_every_order()
+		# cs.exit()
 		mm.exit()
 		# sys.exit()
 		# os.popen('killall python3')
