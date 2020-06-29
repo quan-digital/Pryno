@@ -209,6 +209,7 @@ class PPS:
                     mail.send_email(mailMessage,settings.MAIL_ACTIVITY)
                     with open(charging_file_path,'w') as bills:
                         json.dump(chargefile,bills)
+                        self.mongo_client.insert_billing(chargefile)
 
                     newpayday = payday + datetime.timedelta(days=7)
                     checking_alterations['initialBalance'] = self.wallet_amount
@@ -226,6 +227,7 @@ class PPS:
                 with open(profit_file_path,'w') as f:
                     f.seek(0) 
                     json.dump(checking_alterations, f)
+                    self.mongo_client.insert_profit(checking_alterations)
 
         #Client first week with the bot operating at his account
         except FileNotFoundError:
@@ -243,6 +245,7 @@ class PPS:
 
             with open(profit_file_path,'w') as f:
                 json.dump(profit_data, f)
+                self.mongo_client.insert_profit(profit_data)
 
         #If profit check callback fails notify through email
         except: 
@@ -529,6 +532,9 @@ class PPS:
                 self.exec_logger.info("%s, %s, %s, %s, %s" %
                     (item['text'], item['side'], item['cumQty'], 
                         item['symbol'], item['stopPx'] if item['stopPx'] else (item['price'] or 0)))
+
+                self.mongo_client.insert_exec(dict(text=item['text'],cumQty=item['cumQty'],symbol=item['symbol'],
+                            stopPx_Price=item['stopPx'] if item['stopPx'] else (item['price'] or 0)))
 
             #Check notifications orders
             if item['cumQty'] > 0 and item['clOrdID'] != '':
