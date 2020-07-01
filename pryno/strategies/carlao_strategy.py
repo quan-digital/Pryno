@@ -20,31 +20,8 @@ from pryno.util.api_bitmex import BitMEX
 from pryno.util import logger
 import numpy as np
 
-
-# -*- coding: utf-8 -*-
-
-# - Pryno Position Strategy -
-# * Quan.digital *
-
-from time import sleep
-import datetime
-import sys
-import os
-from os.path import getmtime
-import random
-import atexit
-import traceback
-import json
-import pryno.util.mail as mail
-import pryno.util.tools as tools
-import pryno.util.settings as settings
-import pryno.telegram_bot.quan_bot as telegram_bot
-from pryno.util.api_bitmex import BitMEX
-from pryno.util import logger
-
 # Used for reloading the bot - saves modified times of key files
 watched_files_mtimes = [(f, getmtime(f)) for f in settings.WATCHED_FILES]
-
 
 class Carlao_Strategy:
 
@@ -54,7 +31,7 @@ class Carlao_Strategy:
         sys.excepthook = logger.log_exception
         atexit.register(self.__on_close)
         # self.logger = logger.setup_logger()
-        self.logger = logger.setup_logbook(name="pps")
+        self.logger = logger.setup_logbook(name="Carlao Strategy")
         self.logger.info("Pryno is starting.")
         self.SLEEP_TELEGRAM = settings.SLEEP_TELEGRAM
 
@@ -69,43 +46,26 @@ class Carlao_Strategy:
                 symbol=self.symbol, apiKey=settings.BITMEX_KEY, apiSecret=settings.BITMEX_SECRET)
 
         # Class parameters
-        self.stopSet = 0
-        self.stopMarketSell = ''
-        self.stopMarketBuy = ''
-        self._contractStep = 10
-        self._sanityCounter = 0
-        self.offset_index = 0
-        self.c1 = 0
-        self.c2 = 0
-        self.c3 = 0
-        self.c4 = 0
         self.wallet_amount = 0
-        self.c_old = 0
         self.available_margin = {}
         self.instrument = {}
-        self.tickSize = 0
         self.actualPrice = 0
-        self._ExecStatusTarget = ''
-        self.botHighStepInfo = ''
         self.last_execution = ''
         self.position = []
-        self.first_time = True
-        self.aboveHighStep = False
-        self.step_number = 0
         self.starting = True
+
+        ## State Machine ##
+        self.reached_stop = False
+        self.reached_target = False
+        self.state_short = 0
+        self.state_long = 0
 
         # Write operation file for bot control
         if force_operate:
             with open(settings.LOG_DIR + 'operation.json', 'w') as op:
                 json.dump(dict(operation=True), op)
 
-        current_stop_path = settings.LOG_DIR + 'last_stop.json'
-        try:
-            with open(current_stop_path, 'r') as f:
-                self.botStopInfo = json.load(f)
-        except:
-            self.botStopInfo = ''
-
+        
         telegram_bot.send_group_message(msg="🔁 Bot for {0} starting with strategy {1} v {2}".format(settings.CLIENT_NAME,
                 settings.STRATEGY_NAME, settings.BOT_VERSION))
 
@@ -115,7 +75,7 @@ class Carlao_Strategy:
         self.logger.info("-\*                        .                        */-")
         self.logger.info("Pryno Carlao Strategy starting, connecting to BitMEX.")
         self.logger.info("Using symbol %s." % self.symbol)
-        self.logger.info("Version 1.0")
+        self.logger.info("Version 0.0")
         self.logger.info("-\*                        .                        */-")
         self.logger.info("-\*                        .                        */-")
         self.logger.info("-\*                        .                        */-")
@@ -272,7 +232,7 @@ class Carlao_Strategy:
 
     def __on_close(self):
         '''Handling exit.'''
-        if(not self.position):
+        if(self.position):
             if self.position[0]['currentQty'] == 0:
                 self.exchange.cancel_every_order()
                 self.logger.info('No positions, all orders cancelled.')
@@ -287,246 +247,11 @@ class Carlao_Strategy:
         # os.popen('killall python3')
         # sys.exit(0)
 
-    def prepare_order_dynamic(self,index,priceStep,one_time):
-        '''
-        This functions prepare orders with variated price step, starting with a range of 15$ for the
-        Low risk orders and rising up to the priceStep for the rest of the orders with an offset   
-        '''
-        index = index + 1
-        acumulado = 0
-        offset_price = 15
-        step_price = settings.INITIAL_STEP if(index < settings.LOW_RISK_ORDER) else priceStep
-        if(one_time):
-            self.offset_index = self.offset_index + 1 if(settings.MEDIUM_RISK_ORDER > index >  settings.ORDER_INCREASE_INTERVAL) else self.offset_index
-        acumulado = acumulado + step_price*index + offset_price*self.offset_index
-        self.logger.info('Contract of {0}, and the price {1}, and offset price {2}'.format(index,acumulado,self.offset_index))
-        return acumulado
-
-    def prepare_order_static(self,index,priceStep,one_time):
-        '''
-        Static priceStep orders, seems to be more secure and profitable than Dinamic PrepareOrder
-        '''
-        index = index + 1
-        acumulado = 0
-        acumulado = acumulado + priceStep*index
-        return acumulado
-        
-    def prepare_contract(self,index):
-        '''
-        Prepare a variated amount of contracts opening in order to try to minimize the stop loss
-        pulling the medium price up, but levels up leverage as well
-        '''
-        index = index + 1
-        if index == 1:
-            contract = round(settings.SMALL_CONTRACT*self.actualPrice*tools.XBt_to_XBT(self.available_margin['availableMargin']))/settings.RISK_DIVISOR
-            self.c1 = contract
-        elif  index == 2:
-            contract = self.c1 + round(settings.SMALL_CONTRACT*self.actualPrice*tools.XBt_to_XBT(self.available_margin['availableMargin']))/settings.RISK_DIVISOR
-            self.c2 = contract
-        elif index == 3:
-            contract = self.c2 + round(settings.SMALL_CONTRACT*self.actualPrice*tools.XBt_to_XBT(self.available_margin['availableMargin']))/settings.RISK_DIVISOR
-        elif index == 4:
-            contract = 2*self.c2 + self.c1
-            self.c4 = contract 
-        elif index == 5:
-            contract = self.c4 + self.c1
-            self.c_old = contract
-        elif 11 > index > 5:
-            contract =  self.c_old + self.c1
-            self.c_old = contract
-        elif index == 11:
-            contract = self.c_old
-        elif index == 12:
-            contract = round(self.c_old*1.3)
-            self.c_old = contract
-        elif index == 13:
-            contract = round(self.c_old*1.5)
-        return contract
-
-    def daily_digest(self):
-        '''Daily profits digest for bot.'''
-
-        profit_file_path = settings.FIN_DIR + 'initialBalance.json'
-        with open(profit_file_path,'r') as f:
-            client_info = json.loads(f.read())
-
-        message_time = datetime.datetime.now()
-        profit = (self.wallet_amount - self.daily_balance)/self.daily_balance 
-        message  = "☑️ A day has passed, now its {0}/{1} and {2} had a gain of {3:.2%},\
-        now his balance is {4} XBT".format(str(message_time.month),str(message_time.day),
-            settings.CLIENT_NAME,profit,tools.XBt_to_XBT(self.wallet_amount))
-        telegram_bot.send_group_message(msg=message)
-        sleep_time = random.uniform(0.1, 1)*self.SLEEP_TELEGRAM
-        sleep(sleep_time)
-
-    def post_gradle_orders(self):
-        '''Post gradle orders + stop to both sides'''
-        orders = []
-        self.first_time = True
-        if(self.amountOpenOrders != settings.TOTAL_STEP*2 + settings.STOP_MARKET_ORDERS):
-            # Not idle and no gradle - anomaly
-            if(self.amountOpenOrders > 0):
-                self.logger.warning("Order number anomaly detected")
-                self.logger.info("Cancelling every order")
-                self.exchange.cancel_every_order()
-
-            accumulation = True
-            if(self.operationParameters['avgTrade'] > 2800):
-                accumulation = False
-
-            if(self.operationParameters['amplitude'] >self.priceStep*3):
-                accumulation = True
-            # Filters fulfilled
-            if(self.operationParameters['average_dollarMinute'] > settings.MIN_DM*settings.ENABLE_VOLUMAMP):
-                if(self.operationParameters['amplitude'] > self.priceStep*2*settings.ENABLE_VOLUMAMP):
-                    if(settings.ENABLE_VOLUMAMP == 0):
-                        self.operationParameters['lockAnomaly'] = False
-                    if(not self.operationParameters['lockAnomaly']):
-                        if (self.operationParameters['amplitude']*settings.ENABLE_VOLUMAMP < self.priceStep*10):
-                            # Double checking http parameters
-                            if(self.volumeActual > 0 and self.actualPrice > 0):
-                                self.stopSet = 0
-                                self.totalContracts = 0
-                                #Telegram send message when orders are being opened
-                                # telegram_bot.send_group_message(msg = 'The bot from {0} is opening orders \
-                                # 	bitcoin price is {1} and for the server is {2}'.format(settings.CLIENT_NAME,self.actualPrice,datetime.datetime.now()))
-                                #Contract amount to get for each gradle order
-                                #0.215
-                                if(settings.ISOLATED_MARGIN_FACTOR > 1):
-                                    self._contractStep = round(settings.ISOLATED_MARGIN_FACTOR*settings.CONTRACT_PCT*self.actualPrice*tools.XBt_to_XBT(self.available_margin['availableMargin']))/settings.RISK_DIVISOR
-                                    #Specific setup for Mac-10 testing
-                                    if(settings.CLIENT_NAME == 'Tonho'):
-                                        if(self._contractStep < 25):
-                                            self._contractStep = 40
-                                else:
-                                    self._contractStep = round(settings.CONTRACT_PCT*self.actualPrice*tools.XBt_to_XBT(self.available_margin['availableMargin']))/settings.RISK_DIVISOR
-                                lastPrice = tools.toNearest(self.actualPrice, self.tickSize)
-                                for index in range(settings.TOTAL_STEP):
-                                    #Regular gordo contract step
-                                    orderBuy = self.exchange.format_order(round(self._contractStep * (1 + index)), lastPrice - self.prepare_order_static(index,self.priceStep,True),index)
-                                    orders.append(orderBuy)
-                                    orderSell = self.exchange.format_order(round(-(self._contractStep * (1 + index))), lastPrice + self.prepare_order_static(index,self.priceStep,False),index)
-                                    orders.append(orderSell)
-                                    # Total amount contracts for stops
-                                    self.totalContracts = self.totalContracts + round(self._contractStep * (1+index))
-
-                                
-                                self.logger.info("Posting gradle orders")
-                                sent_orders = self.exchange.create_bulk_orders(orders)
-                                logger.log_orders(sent_orders)
-
-                                # Stop market orders
-                                self.logger.info("Posting stop orders")
-                                self.stopMarketSell = self.stop_market('Sell')
-                                self.stopMarketBuy = self.stop_market('Buy')
-                                self.offset_index = 0
-
-        # Filters conditions not met
-        else:
-            if(self.operationParameters['average_dollarMinute'] < settings.MIN_DM_CANCEL*settings.ENABLE_VOLUMAMP or 
-                                    (self.operationParameters['amplitude'] < self.priceStep*2*settings.ENABLE_VOLUMAMP and self.operationParameters['amplitude'] > 0)
-                                            or self.operationParameters['lockAnomaly']):
-                # No position, keep waiting for better market conditions
-                if(self.position[0]['currentQty'] == 0 ):
-                    self.logger.info("Bitmex flow is too innocuous, halting every order")
-                    self.exchange.cancel_every_order()
-                    message = "🔑 Lock anomaly is true. No position, all orders cancelled for {}.".format(settings.CLIENT_NAME)
-                    telegram_bot.send_group_message(msg= message,bot_token=settings.DEBUGGER_BOT,chat_id=settings.DEBUGGER_BOT_GROUP)
-
-    def position_loop(self,side):
-        '''Buy/sell position loop
-        Cancel opposite side orders, post target and stop market'''
-
-        found = False #Target
-        foundStop = False
-        switchOpenOrder={
-            "Buy": tools.toNearest(self.positionPrice - settings.PROFIT_TARGET,self.tickSize),
-            "Sell": tools.toNearest(self.positionPrice + settings.PROFIT_TARGET,self.tickSize),
-        }
-        toCancel = []
-        # Order loop
-        for openOrder in self.openOrders:
-            if openOrder['ordType'] != 'Stop':
-                if openOrder['side'] ==side:
-                    if openOrder['price'] == switchOpenOrder.get(side):
-                        if openOrder['orderQty'] == abs(self.positionContracts):
-                            self.logger.info("Found target")
-                            found = True
-                        else:
-                            toCancel.append(openOrder['orderID'])	
-                    else:
-                        self.logger.info("Appending order from the side: {0} and the order anyways {1}".format(side,openOrder))
-                        toCancel.append(openOrder['orderID'])
-            else:
-                foundStop = True
-                self.logger.info("Stop found {0}".format(openOrder))
-                # Cancel opposite stop
-                if(openOrder['side'] != side):
-                    toCancel.append(openOrder['orderID'])
-
-        # Double check for stop also for when the bot resets if cancels orderns in position
-        if(not foundStop):
-            self.logger.info('Stop not found')
-            if(side == 'Sell'):
-                self.exchange.place_order(quantity = -self.position[0]['currentQty'],price = self.actualPrice - 240,type_order='Stop',side ='Buy')
-            elif(side == 'Buy'):
-                self.exchange.place_order(quantity = -self.position[0]['currentQty'],price = self.actualPrice + 240,type_order='Stop',side ='Sell')
-        
-        # Cancels every order except for target
-        if len(toCancel):
-            self.logger.info("Deleting {0} orders".format(side))
-            canceled_orders = self.exchange.cancel_bulk(toCancel)
-            logger.log_orders(canceled_orders)
-
-        if(found == False):
-            # Checks if there is an open position and places target
-            if(self.position[0]['currentQty']):
-                while(self.positionPrice <= 0):
-                    self.positionPrice = round(abs(self.position[0]['avgEntryPrice']))
-                    self.logger.info("Position price is {0}".format(self.positionPrice))
-                orderTarget = self.exchange.place_order(-self.position[0]['currentQty'], switchOpenOrder.get(side),target = side)
-                self.logger.info("Placing target at {0}".format(orderTarget))
-                telegram_bot.send_group_message(msg = '🔥 The bot from {0} is setting a new target \
-                        in the value {1} at {2} on server time'.format(settings.CLIENT_NAME,orderTarget,datetime.datetime.now()),
-                        bot_token = settings.DEBUGGER_BOT,chat_id=settings.DEBUGGER_BOT_GROUP)
-                logger.log_orders(orderTarget)
-                settings._REACHED_TARGET = True
-        #This is for canceling order gradle before
-        if(self.operationParameters['lockAnomaly'] and self.first_time):
-            if(not self.aboveHighStep):
-                # telegram_bot.send_group_message("Lock anomaly is true and bot is in position for {} \
-                # 	, canceling all gradle orders please watch the bot".format(settings.CLIENT_NAME))
-                # self.exchange.cancel_every_order()
-                telegram_bot.send_group_message("🔒 Lock anomaly is true and bot is in position for {0}, below highStep : {1}. Volume spike: {2}".format(
-                                                    settings.CLIENT_NAME,self.step_number,self.operationParameters.get('major_volume',0)))
-                self.first_time = False
-            else:
-                telegram_bot.send_group_message("🔏  Lock anomaly is true and bot is in position for {0},\
-                    over highStep : {1}. Volume spike: {2}".format(settings.CLIENT_NAME,self.step_number,self.operationParameters.get('major_volume',0)))
-
-    def stop_market(self,side):
-        '''
-            Create the stop markets Orders to aviod account liquidation
-            Currently creating stop on the place of settings.TOTAL_STEP + 1
-        '''
-        self.stopSet = 1
-        lastPrice = tools.toNearest(self.actualPrice, self.tickSize)
-        if(side == 'Buy'):
-            orderStopMarket = self.exchange.place_order(quantity = -self.totalContracts,price = tools.toNearest(lastPrice - self.prepare_order_static(settings.TOTAL_STEP,self.priceStep,False),self.tickSize),type_order='Stop',side ='Buy')
-        else:
-            orderStopMarket = self.exchange.place_order(quantity = self.totalContracts,price = tools.toNearest(lastPrice + self.prepare_order_static(settings.TOTAL_STEP,self.priceStep,False),self.tickSize),type_order='Stop',side ='Sell')
-        logger.log_orders(orderStopMarket)
-        return orderStopMarket['orderID']
-
     def check_execution_status(self):
         '''
         Check through HTTP request the last execution and if it's one of a kind we are monitoring
         save it locally to avoid repetitions and set flags to send notifications accordingly
         '''
-        # High step case
-        _ExecStatusHighStep = ''
-        _ExecStatusStop = ''
-        _ExecStatusTarget = ''
         #Get last execution http request
         try:
             item = self.exchange.get_execution()[0]
@@ -548,47 +273,16 @@ class Carlao_Strategy:
                     (item['text'], item['side'], item['cumQty'], 
                         item['symbol'], item['stopPx'] if item['stopPx'] else (item['price'] or 0)))
 
-            #Check notifications orders
-            if item['cumQty'] > 0 and item['clOrdID'] != '':
-                if str(item['clOrdID'][settings.GRADLE_INDICATOR_INIT:settings.GRADLE_INDICATOR_END]) == ('Buy' or 'Sel'):
-                    self.step_number = item['clOrdID'][settings.GRADLE_NUMBER]
-                    if int(item['clOrdID'][settings.GRADLE_NUMBER]) > settings.SEND_EMAIL_GRADLE:
-                        self.aboveHighStep = True
-                        if(self.botHighStepInfo != ''):
-                            if(self.botHighStepInfo['orderID'] != item['orderID']):
-                                settings._HIGH_STEP_ORDER = True
-                                _ExecStatusHighStep = item
-                        else:
-                            settings._HIGH_STEP_ORDER = True
-                            _ExecStatusHighStep = item
-                    else:
-                        self.aboveHighStep = False
-
-                # Stop reached case
-                elif str(item['clOrdID'][settings.STM_INDICATOR_INIT:settings.STM_INDICATOR_END]) == 'Stm':
-                    if(self.botStopInfo != ''):
-                        _ExecStatusStop = item
-                        if(self.botStopInfo['orderID'] != item['orderID']):
-                            settings._REACHED_STOP = True
-                            current_stop_path = settings.LOG_DIR + 'last_stop.json'
-                            with open(current_stop_path, 'w') as f:
-                                json.dump(_ExecStatusStop, f)
-                    else:
-                        settings._REACHED_STOP = True
-                        _ExecStatusStop = item
-                        current_stop_path = settings.LOG_DIR + 'last_stop.json'
-                        with open(current_stop_path, 'w') as f:
-                            json.dump(_ExecStatusStop, f)
-
-                # Target reached case
-                elif str(item['clOrdID'][settings.STM_INDICATOR_INIT:settings.STM_INDICATOR_END]) == 'Tgt':
-                    if(self._ExecStatusTarget != ''):
-                        if(self._ExecStatusTarget['execID'] != item['execID']):
-                            settings._REACHED_TARGET = True
-                            _ExecStatusTarget = item
-                    else:
-                        settings._REACHED_TARGET = True
-                        _ExecStatusTarget = item
+                #Check notifications orders
+                if item['cumQty'] > 0 and item['clOrdID'] != '':
+                    
+                    # Stop reached case
+                    if str(item['clOrdID'][settings.STM_INDICATOR_INIT:settings.STM_INDICATOR_END]) == 'Stm':
+                        self.reached_stop = True  
+                        
+                    # Target reached case
+                    elif str(item['clOrdID'][settings.STM_INDICATOR_INIT:settings.STM_INDICATOR_END]) == 'Tgt':
+                        self.reached_target = True   
         else:
             #Placing market orders on Bitmex 
             self.exchange.place_order(quantity = 1,price = 0,type_order='Market',side ='Buy')
@@ -596,92 +290,81 @@ class Carlao_Strategy:
 
         #Save last execution
         self.last_execution = item
-        return [_ExecStatusHighStep,_ExecStatusStop,_ExecStatusTarget]
+        return item
+   
+    def daily_digest(self):
+        '''Daily profits digest for bot.'''
 
+        profit_file_path = settings.FIN_DIR + 'initialBalance.json'
+        with open(profit_file_path,'r') as f:
+            client_info = json.loads(f.read())
 
-    def calc_correcao(N1,N2):
-		SSC1 = 2/(N1+1) #rápida
-		SSC2 = 2/(N2+1) #lenta
-		a1= 1 - SSC1
-		a2= 1 - SSC2
-		return (a2-a1)/((1-a1)*(1-a2))
+        message_time = datetime.datetime.now()
+        profit = (self.wallet_amount - self.daily_balance)/self.daily_balance 
+        message  = "☑️ A day has passed, now its {0}/{1} and {2} had a gain of {3:.2%},\
+        now his balance is {4} XBT".format(str(message_time.month),str(message_time.day),
+            settings.CLIENT_NAME,profit,tools.XBt_to_XBT(self.wallet_amount))
+        telegram_bot.send_group_message(msg=message)
+        sleep_time = random.uniform(0.1, 1)*self.SLEEP_TELEGRAM
+        sleep(sleep_time)
 
-	def calc_med_ema(sinal,N):
-		ema = np.zeros(len(sinal))
-		ema[0] = sinal[0]
-		SSC = 2/(N+1)
-		for i in range(1,len(sinal)):            
-		    ema[i] = ema[i-1]*(1-SSC) + sinal[i]*SSC
-		return ema
+    def calc_correcao(self,N1,N2):
+        SSC1 = 2/(N1+1) #rápida
+        SSC2 = 2/(N2+1) #lenta
+        a1= 1 - SSC1
+        a2= 1 - SSC2
+        return (a2-a1)/((1-a1)*(1-a2))
+    
+    def entry(self):
+        balance = self.exchange.get_margin()['walletBalance']
+        stop_loss = 75/self.actualPrice # Stop Loss fixed in $75
+        risk_per_trade = (balance*(settings.RISK_PER_TRADE/100))
+        entry = tools.toNearest(tools.XBt_to_XBT(risk_per_trade / stop_loss) * self.actualPrice)
+        return entry
 
-	def MACD(sinal,N1,N2,N3):
-		correcao = calc_correcao(N1,N2)
-		emaN1 = calc_med_ema(sinal,N1)
-		emaN2 = calc_med_ema(sinal,N2)
-		linha_MACD = (emaN1 - emaN2)/correcao # rápida - lenta (1 derivada)
-		linha_sinal = calc_med_ema(linha_MACD,N3) # lenta
-		return linha_sinal
+    def calc_med_ema(self,candles,N):
+        ema = np.zeros(len(candles))
+        ema[0] = candles[0]
+        SSC = 2/(N+1)
+        for i in range(1,len(candles)):            
+            ema[i] = ema[i-1]*(1-SSC) + candles[i]*SSC
+        return ema
 
-	def should_long(close):
-		# Tendência de alta----------------------------------------------
-		estado = 0
-		if MACD(close, 12*7, 26*7, 9*7 ) > 0:
-		    # Condição necessária  (convergência: linhas de mesmo sinal)
-		    if MACD(close, 7, 14, 13) > MACD(close, 12*7, 26*7, 9*7 ) and estado == 0:
-		        estado = 1
+    def MACD(self,candles,N1,N2,N3):
+        correcao = self.calc_correcao(N1,N2)
+        emaN1 = self.calc_med_ema(candles,N1)
+        emaN2 = self.calc_med_ema(candles,N2)
+        linha_MACD = (emaN1 - emaN2)/correcao # rápida - lenta (1 derivada)
+        linha_sinal = self.calc_med_ema(linha_MACD,N3) # lenta
+        return linha_sinal[-1]
 
-		    # Condição suficiente 1 (princípio da divergência) (sinal opostos)
-		    if MACD(close, 7, 14, 13) < 0 and estado == 1:
-		        estado = 0
-		else:
-		    estado = 0
-		return
+    def sorting_index(self,candles,N=130,prec=1e-3):
+        # Obtém séries de dados ordenadas de forma crescente e decrescente
+        # Critério de corte em 92% e 130 periodos
+        
+        y_alta = np.sort(candles)
+        y_queda = y_alta[::-1]
+        den =  np.sum(np.power((candles - np.mean(candles)),2))
 
-	def should_short(close):
-		# %Tendência de queda---------------------------------------------------
-		estado = 0
-		if MACD(close, 12*7, 26*7, 9*7 ) < 0:
-			# Condição necessária (convergência: linhas de mesmo sinal)
-			if MACD(close, 7, 14, 13)< MACD(close, 12*7, 26*7, 9*7 ) and estado == 0:
-			    estado = 1
-
-			#  %Condição suficiente 1 (princípio da divergência) (sinais opostos)
-			if MACD(close, 7, 14, 13) > 0 and estado == 1:
-			    estado = 0
-		else:
-			estado = 0
-		return
-
-	def sorting_indicator(sinal, N):
-		# Obtém séries de dados ordenadas de forma crescente e decrescente
-		# Utilizar Critério de corte em 92% e 130 periodos
-		# Somente define tendência acima de 92%
-		y_alta = np.sort(sinal)
-		y_queda = y_alta[::-1]
-		prec= 1e-3
-
-		den =  np.sum(np.power((sinal - np.mean(sinal)),2))
-
-		# Cálcula R2 de alta
-		num =  np.sum(np.power((sinal - y_alta),2))
-		R2_alta  = 100*(1 - num/(den+prec))
-
-		# Cálcula R2 de queda
-		num =  np.sum(np.power((sinal - y_queda),2))
-		R2_queda  = 100*(1 - num/(den+prec))
-
-		# Tomada de decisão: Qual a tendência preponderante
-		if R2_alta > R2_queda:
-			R2 = R2_alta
-		else:
-			R2 = -R2_queda
-		return R2
-
+        # Cálcula R2 de alta
+        num_H =  np.sum(np.power((candles - y_alta),2))
+        R2_alta  = (100*(1 - num_H/(den+prec))) if (100*(1 - num_H/(den+prec))) > 0 else 0
+        
+        # Cálcula R2 de queda
+        num_L =  np.sum(np.power((candles - y_queda),2))
+        R2_queda  = (100*(1 - num_L/(den+prec))) if (100*(1 - num_L/(den+prec))) > 0 else 0
+    
+        # Tomada de decisão: Qual a tendência preponderante
+        if R2_alta > R2_queda:
+            R2 = R2_alta
+        else:
+            R2 = -R2_queda
+        return R2
 
     def run_loop(self):
         '''
         Main bot loop
-        operationParameters: highestPrice, lowestPrice, amplitude, Date, volume, lastPrice
+        operationParameters: lastPrice
         '''
         while(True):
 
@@ -695,7 +378,6 @@ class Carlao_Strategy:
             # Operation Parameters Request
             self.operationParameters = self.exchange.get_operationParameters("XBTUSD", settings.CANDLE_TIME_INTERVAL, "1m")
             self.actualPrice = self.operationParameters['lastPrice']
-            self.volumeActual = round(self.operationParameters['volume'])
             #telegram_bot.send_group_message('the actual price {} for {}, '.format(self.actualPrice,settings.CLIENT_NAME))		
 
             # Requesting HTTP needed info for bot operation
@@ -703,10 +385,12 @@ class Carlao_Strategy:
             self.position = self.exchange.http_get_position()
             self.instrument = self.exchange.get_instrument()[0]
 
-
             #Getting candles for MACD avaliarion
-            self.candles = self.exchange.get_candles("XBTUSD", settings.CANDLE_TIME_INTERVAL, "1m")
+            self.candles = self.exchange.get_close("XBTUSD", settings.CANDLE_TIME_INTERVAL, "1m")
 
+            #Check client execution status 
+            self.check_execution_status()
+            
             #Check if there is no open position open(HTTP request returns null when no position open)
             if(not len(self.position)):
                 self.logger.info("position {}".format(self.position))
@@ -724,7 +408,6 @@ class Carlao_Strategy:
                 self.avgEntryPrice = self.position[0]['avgEntryPrice']
                 self.breakEvenPrice = self.position[0]['breakEvenPrice']
 
-
             #Definir em quanto quer alavancar o bot
             if(settings.FIXED_MARGIN_FLAG):
                 if(self.leverage != None):
@@ -740,66 +423,108 @@ class Carlao_Strategy:
             self.amountOpenOrders = len(self.openOrders)
 
 
-            #Escrever código dos indicadores aqui
+            self.logger.info("/////////////////////////////")
+            self.logger.info('------TESTE PARÂMETROS-------')
+            self.logger.info("=============================")
+            self.logger.info('Sorting Index: {}'.format(self.sorting_index(self.candles)))
+            self.logger.info('MACD Long: {}'.format(self.MACD(self.candles,12*7, 26*7, 9*7)))
+            self.logger.info('MACD Short: {}'.format(self.MACD(self.candles,7, 14, 13)))
+            self.logger.info('walletBalance in Dol: {}'.format(tools.toNearest(tools.XBt_to_XBT(self.exchange.get_margin()['walletBalance']) * self.actualPrice)))
+            self.logger.info('walletBalance in XBT: {}'.format(round(tools.XBt_to_XBT(self.exchange.get_margin()['walletBalance']),8)))
+            self.logger.info("/////////////////////////////")
+            self.logger.info('position Contracts: {}'.format(self.positionContracts))
+            self.logger.info('open orders {}'.format(self.amountOpenOrders))
+            self.logger.info('State Short: {}'.format(self.state_short))
+            self.logger.info('State Long: {}'.format(self.state_long))
+            self.logger.info('last execution {}'.format(self.last_execution))
+            self.logger.info("=============================")
+            self.logger.info("/////////////////////////////")
 
-            #Check client execution status
-            #Get the last executions data 
-            #self.botHighStepInfo,self.botStopInfo,self._ExecStatusTarget = self.check_execution_status()
-
-            # Calculating Bot Price Step and TickSize
-            self.tickSize = self.instrument['tickSize']
-            #try: # thats only for testnet bug
             
-            # Price Steps for contracts
-            # self.priceStep = 10*round(self.actualPrice*settings.STEP_PCT/10)
-            # #except:
-            #     #self.priceStep = self.priceStep  
+            # If reached Stop Loss   
+            if self.reached_stop:
+                self.state_short = 0
+                self.state_long = 0
+                self.exchange.cancel_every_order()
+                self.reached_stop = False
 
-            # # Setting priceStep boundaries
-            # if self.priceStep < settings.MIN_STEP: 
-            #     self.priceStep = settings.FIXED_STEP
-            # elif self.priceStep > settings.MAX_STEP:
-            #     self.priceStep = settings.MAX_STEP
-            # # Fixed PriceStep, comment it if you want priceStep relative to bitcoin actual price
-            # self.priceStep = settings.FIXED_STEP
+                # Notify if Stop order was executed
+                telegram_message = "🛑 Stop order executed for {0} at ${1}".format(
+                                settings.CLIENT_NAME,self.last_execution["stopPx"])
+                telegram_bot.send_group_message(msg =telegram_message)
 
-            # if(self.available_margin['availableMargin'] > 0):
-            #     #Check user balance if theres money
-            #     self._profit_check()
-            #     if(self.starting):
-            #         self.daily_balance = self.wallet_amount
-            #         self.starting = False
+            # If reached Profit Target
+            if self.reached_target:
+                self.state_short = 0
+                self.state_long = 0
+                self.exchange.cancel_every_order()
+                self.reached_target = False
 
-            # #Notify if High Step Order executed
-            # if(settings._HIGH_STEP_ORDER):
-            #     self.logger.info("High step order executed, alerting bot masters")
-            #     mailMessage = "⚠️ High step order executed for {0}. Step: {1}. Price: {2}.".format(
-            #                         settings.CLIENT_NAME,self.step_number,self.botHighStepInfo.get('price',None))
-            #     telegram_bot.send_group_message(msg =mailMessage)
-            #     settings._HIGH_STEP_ORDER = False
+                # Notify if Profit target order was executed
+                telegram_message = "✅ Profit Target order executed for {0} at ${1}".format(
+                                settings.CLIENT_NAME,self.last_execution["price"])
+                telegram_bot.send_group_message(msg =telegram_message)
+            
+            if self.positionContracts == 0:
+                
+                # self.exchange.place_order(quantity = 1,price = 0, type_order='Market', side ='Buy')
+                # telegram_message = "🚨 TESTE Long entry found for {0} at ${1}".format(
+                #                 settings.CLIENT_NAME,self.actualPrice)
+                # telegram_bot.send_group_message(msg =telegram_message)
 
-            # #Notify if client been stopped
-            # if(settings._REACHED_STOP):
-            #     self.available_margin = self.exchange.get_margin()
-            #     profit_file_path = settings.FIN_DIR + 'initialBalance.json'
-            #     with open(profit_file_path) as f:
-            #         checking_alterations = json.loads(f.read())
-            #         initial_balance = checking_alterations['initialBalance']
+                # self.exchange.place_order(quantity = -1,price = self.actualPrice - 0.5,type_order='Stop',side ='Buy')
+                # self.exchange.place_order(quantity= -1, price=self.actualPrice + 0.5,type_order = 'Limit', side = 'Buy', target= 'Buy')
 
-            #     loss = (self.available_margin['walletBalance'] - initial_balance)/initial_balance
-            #     mailMessage = str("Stop order executed for {} couldnt detect the further stop info".format(settings.CLIENT_NAME))
-            #     if(self.botStopInfo != ''):
-            #         telegram_message = "🛑 Stop order executed for {0}. stopPx: {1}. Percentage lost: {2:.2%}".format(
-            #                         settings.CLIENT_NAME,self.botStopInfo.get("stopPx",None),loss)
-            #         telegram_bot.send_group_message(msg =telegram_message)
-            #         mail.send_email(telegram_message)
-            #     else:
-            #         mail.send_email(mailMessage)
-            #     self.logger.info("Stop order executed, halting bot for 1 day.")
-            #     self.exchange.cancel_every_order()
-            #     sleep(settings._SLEEP_FOR_ONE_DAY)
-            #     settings._REACHED_STOP = False
+                # Long / Tendência de alta
+                if self.MACD(self.candles,12*7,26*7,9*7) > 0 and self.sorting_index(self.candles) > 92:
+                    # Condição necessária  (convergência: linhas de mesmo sinal)
+                    if self.MACD(self.candles,7,14,13) > self.MACD(self.candles,12*7,26*7,9*7 ) and self.state_long == 0:
+                        self.state_long = 1
+                    # Condição suficiente 1 (princípio da divergência) (sinal opostos)
+                    if self.MACD(self.candles,7,14,13) < 0 and self.state_long == 1:
+                        self.exchange.place_order(quantity = entry(),price = 0, type_order='Market', side ='Buy')
+                        self.exchange.place_order(quantity = -entry(),price = self.actualPrice - 75,type_order='Stop',side ='Buy')
+                        self.exchange.place_order(quantity= -entry(), price=self.actualPrice + 75,type_order = 'Limit', side = 'Buy', target= 'Buy')
+                        self.state_long = 2
+                    
+                        telegram_message = "🚨 Long entry found for {0} at ${1}".format(
+                                    settings.CLIENT_NAME,self.actualPrice)
+                        telegram_bot.send_group_message(msg =telegram_message)
 
+                # Short / Tendência de queda
+                elif self.MACD(self.candles,12*7,26*7,9*7) < 0 and self.sorting_index(self.candles) < -92:
+                    # Condição necessária (convergência: linhas de mesmo sinal)
+                    if self.MACD(self.candles,7,14,13)< self.MACD(self.candles,12*7,26*7,9*7 ) and self.state_short == 0:
+                        self.state_short = 1
+                    #  %Condição suficiente 1 (princípio da divergência) (sinais opostos)
+                    if self.MACD(self.candles,7,14,13) > 0 and self.state_short == 1:
+                        self.exchange.place_order(quantity = -entry(),price = 0, type_order='Market', side ='Sell')       
+                        self.exchange.place_order(quantity = entry(),price = self.actualPrice + 75,type_order='Stop',side ='Sell')
+                        self.exchange.place_order(quantity= entry(), price=self.actualPrice - 75,type_order = 'Limit', side = 'Sell', target= 'Sell')
+                        self.state_short = 2 
+
+                        telegram_message = "🚨 Short entry found for {0} at ${1}".format(
+                                settings.CLIENT_NAME,self.actualPrice)
+                        telegram_bot.send_group_message(msg =telegram_message)
+                else:
+                    self.state_short = 0
+                    self.state_long = 0
+
+            elif (self.positionContracts > 0 and self.state_long == 2) or (self.positionContracts < 0 and self.state_short == 2):
+                if self.amountOpenOrders != 2:
+                    self.exchange.cancel_every_order()
+                    self.state_short = 0
+                    self.state_long = 0
+        
+                
+            if(self.available_margin['availableMargin'] > 0):
+                #Check user balance if theres money
+                self._profit_check()
+                if(self.starting):
+                    self.daily_balance = self.wallet_amount
+                    self.starting = False
+
+            
             # Check if bot is ON or OFF
             if not(operation):
                 self.logger.info("~: Bot is Paused :~")
@@ -811,20 +536,6 @@ class Carlao_Strategy:
                 	print('State Machine for bot operation')
                 	#TODO: Maquina de estados estratégia carlão
 
-                    
-                	#Descomentar essa parte para ter o bot operando com a estratégia de market maker padrão
-                    # Check if it's in position
-                    # if(self.positionContracts == 0):
-                    #     self.logger.info("No open position, starting idle loop...")
-                    #     # self.post_gradle_orders()
-
-                    # elif(self.positionContracts < 0):
-                    #     self.logger.info("Short position found, beginning Buy Target loop.")
-                    #     # self.position_loop('Buy')
-
-                    # elif(self.positionContracts > 0):
-                    #     self.logger.info("Long position found, beginning Sell Target loop.")
-                    #     # self.position_loop('Sell')
                 else:
                     self.logger.info('There are not enough funds on the account.')
                     # telegram_bot.send_group_message(msg ='💲There are not enough funds on client {1} account, turning bot off.'.format(

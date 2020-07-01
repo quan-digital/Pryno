@@ -12,7 +12,7 @@ BASE_URL = "https://testnet.bitmex.com/api/v1/"
 # Bot email
 CLIENT_NAME = ''
 CLIENT_PWD = ''
-STRATEGY_NAME = 'PPS'
+STRATEGY_NAME = 'Carlao Strategy'
 
 # Bitmex API Key Pair
 BITMEX_KEY = ""
@@ -21,6 +21,9 @@ BITMEX_SECRET = ""
 #####################################################
 # Operation Parameters
 #####################################################
+
+# Risk in percent for each trade
+RISK_PER_TRADE = 3
 
 # Number of steps with lower price step
 LOW_RISK_ORDER = 4  
@@ -31,7 +34,7 @@ ORDER_INCREASE_INTERVAL = 7
 CONTRACT_PCT = 1.75/100
 #Activate Fixed Margin
 FIXED_MARGIN_FLAG = False
-ISOLATED_MARGIN_FACTOR = 5
+ISOLATED_MARGIN_FACTOR = 0
 #Margin funds percentual to get for amount of contracts as steps increases, for dynamic contract steps 
 SMALL_CONTRACT = 0.215
 MEDIUM_CONTRACT = 0.2375
@@ -119,7 +122,7 @@ ADMIN_USERS = {
 POST_ONLY = False
 
 # Time interval to analyse candles
-CANDLE_TIME_INTERVAL = 60
+CANDLE_TIME_INTERVAL = 130
 
 # In seconds
 AUTH_EXPIRE_TIME = 10
@@ -145,7 +148,7 @@ VOLUME_TOLERANCE = 10000000
 SYMBOL = "XBTUSD"
 
 # Strategy name
-BOT_NAME = "PPS"
+BOT_NAME = "CDC"
 
 # path/to/logdir
 LOG_DIR = 'logs/'
@@ -190,8 +193,8 @@ BOT_PWD = "SurubaoParaiso123"
 # Birth date 10/03/2000
 
 # Email receipients
-MAIL_TO_ERROR = ['kauecano@gmail.com', 'claudiocarvalhovilasboas@gmail.com']
-MAIL_ACTIVITY = ['kauecano@gmail.com', 'claudiocarvalhovilasboas@gmail.com','antoniodelimaesilva@gmail.com','alexandre.c.bandarra01@gmail.com']
+MAIL_TO_ERROR = ['gthomquan@gmail.com']
+MAIL_ACTIVITY = ['gthomquan@gmail.com']
 
 #Telegram Bots Token
 TOKEN_MAIN_BOT = "1199841211:AAHi1GPjTQJ0dkBTTXSm8zHcQEUzIwBThcs"

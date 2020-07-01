@@ -50,7 +50,7 @@ def send_message(msg):
     else:
     	print('no one registered in this channel')
 
-def send_group_message(msg,bot_token=settings.TOKEN_MAIN_BOT,chat_id = -496268763):
+def send_group_message(msg,bot_token=settings.TOKEN_MAIN_BOT,chat_id = -1001159559456):
 	try:
 		bot = telegram.Bot(token=bot_token)
 		bot.send_message(chat_id, text=msg)

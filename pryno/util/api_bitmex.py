@@ -299,6 +299,14 @@ class BitMEX(object):
         )
         return candlesHistory
 
+    def get_close(self,symbol,count,size):
+        candlesHistory = self.get_candles(symbol,count,size)
+        if(candlesHistory == None):
+            raise Exception("Error fetching candle history")
+        arrayClose = []
+        for candles in candlesHistory:
+            arrayClose.append(candles['close'])
+        return arrayClose
 
     def get_operationParameters(self,symbol,count,size):
         candlesHistory = self.get_candles(symbol,count,size)
