@@ -53,6 +53,9 @@ class Carlao_Strategy:
         self.last_execution = ''
         self.position = []
         self.starting = True
+        self.quantity = 0
+        self.above_price = 0
+        self.below_price = 0
 
         ## State Machine ##
         self.reached_stop = False
@@ -315,13 +318,6 @@ class Carlao_Strategy:
         a2= 1 - SSC2
         return (a2-a1)/((1-a1)*(1-a2))
     
-    def entry(self):
-        balance = self.exchange.get_margin()['walletBalance']
-        stop_loss = 75/self.actualPrice # Stop Loss fixed in $75
-        risk_per_trade = (balance*(settings.RISK_PER_TRADE/100))
-        entry = tools.toNearest(tools.XBt_to_XBT(risk_per_trade / stop_loss) * self.actualPrice)
-        return entry
-
     def calc_med_ema(self,candles,N):
         ema = np.zeros(len(candles))
         ema[0] = candles[0]
@@ -384,7 +380,6 @@ class Carlao_Strategy:
             self.available_margin = self.exchange.get_margin()
             self.position = self.exchange.http_get_position()
             self.instrument = self.exchange.get_instrument()[0]
-
             #Getting candles for MACD avaliarion
             self.candles = self.exchange.get_close("XBTUSD", settings.CANDLE_TIME_INTERVAL, "1m")
 
@@ -422,25 +417,36 @@ class Carlao_Strategy:
             self.openOrders = self.exchange.http_open_orders()
             self.amountOpenOrders = len(self.openOrders)
 
+            # Define  entry quantity, stop and target
+            self.quantity = round(tools.XBt_to_XBT(self.available_margin['availableMargin']) * self.actualPrice * settings.ISOLATED_MARGIN_FACTOR *0.98)
+            self.above_price = tools.toNearest(self.actualPrice * 1.003)
+            self.below_price = tools.toNearest(self.actualPrice * 0.997)
 
             self.logger.info("/////////////////////////////")
             self.logger.info('------TESTE PARÂMETROS-------')
             self.logger.info("=============================")
             self.logger.info('Sorting Index: {}'.format(self.sorting_index(self.candles)))
-            self.logger.info('MACD Long: {}'.format(self.MACD(self.candles,12*7, 26*7, 9*7)))
+            self.logger.info('MACD Long: {}'.format(self.MACD(self.candles,84,182,63)))
             self.logger.info('MACD Short: {}'.format(self.MACD(self.candles,7, 14, 13)))
             self.logger.info('walletBalance in Dol: {}'.format(tools.toNearest(tools.XBt_to_XBT(self.exchange.get_margin()['walletBalance']) * self.actualPrice)))
             self.logger.info('walletBalance in XBT: {}'.format(round(tools.XBt_to_XBT(self.exchange.get_margin()['walletBalance']),8)))
+            self.logger.info("/////////////////////////////")
+            self.logger.info("/////////////////////////////")
             self.logger.info("/////////////////////////////")
             self.logger.info('position Contracts: {}'.format(self.positionContracts))
             self.logger.info('open orders {}'.format(self.amountOpenOrders))
             self.logger.info('State Short: {}'.format(self.state_short))
             self.logger.info('State Long: {}'.format(self.state_long))
-            self.logger.info('last execution {}'.format(self.last_execution))
-            self.logger.info("=============================")
+            self.logger.info("/////////////////////////////")
+            self.logger.info("/////////////////////////////")
+            self.logger.info("/////////////////////////////")
+            self.logger.info('lquantity {}'.format(self.quantity))
+            self.logger.info('above_price {}'.format(self.above_price))
+            self.logger.info('below_price {}'.format(self.below_price))
+            self.logger.info("/////////////////////////////")
+            self.logger.info("/////////////////////////////")
             self.logger.info("/////////////////////////////")
 
-            
             # If reached Stop Loss   
             if self.reached_stop:
                 self.state_short = 0
@@ -465,58 +471,6 @@ class Carlao_Strategy:
                                 settings.CLIENT_NAME,self.last_execution["price"])
                 telegram_bot.send_group_message(msg =telegram_message)
             
-            if self.positionContracts == 0:
-                
-                # self.exchange.place_order(quantity = 1,price = 0, type_order='Market', side ='Buy')
-                # telegram_message = "🚨 TESTE Long entry found for {0} at ${1}".format(
-                #                 settings.CLIENT_NAME,self.actualPrice)
-                # telegram_bot.send_group_message(msg =telegram_message)
-
-                # self.exchange.place_order(quantity = -1,price = self.actualPrice - 0.5,type_order='Stop',side ='Buy')
-                # self.exchange.place_order(quantity= -1, price=self.actualPrice + 0.5,type_order = 'Limit', side = 'Buy', target= 'Buy')
-
-                # Long / Tendência de alta
-                if self.MACD(self.candles,12*7,26*7,9*7) > 0 and self.sorting_index(self.candles) > 92:
-                    # Condição necessária  (convergência: linhas de mesmo sinal)
-                    if self.MACD(self.candles,7,14,13) > self.MACD(self.candles,12*7,26*7,9*7 ) and self.state_long == 0:
-                        self.state_long = 1
-                    # Condição suficiente 1 (princípio da divergência) (sinal opostos)
-                    if self.MACD(self.candles,7,14,13) < 0 and self.state_long == 1:
-                        self.exchange.place_order(quantity = entry(),price = 0, type_order='Market', side ='Buy')
-                        self.exchange.place_order(quantity = -entry(),price = self.actualPrice - 75,type_order='Stop',side ='Buy')
-                        self.exchange.place_order(quantity= -entry(), price=self.actualPrice + 75,type_order = 'Limit', side = 'Buy', target= 'Buy')
-                        self.state_long = 2
-                    
-                        telegram_message = "🚨 Long entry found for {0} at ${1}".format(
-                                    settings.CLIENT_NAME,self.actualPrice)
-                        telegram_bot.send_group_message(msg =telegram_message)
-
-                # Short / Tendência de queda
-                elif self.MACD(self.candles,12*7,26*7,9*7) < 0 and self.sorting_index(self.candles) < -92:
-                    # Condição necessária (convergência: linhas de mesmo sinal)
-                    if self.MACD(self.candles,7,14,13)< self.MACD(self.candles,12*7,26*7,9*7 ) and self.state_short == 0:
-                        self.state_short = 1
-                    #  %Condição suficiente 1 (princípio da divergência) (sinais opostos)
-                    if self.MACD(self.candles,7,14,13) > 0 and self.state_short == 1:
-                        self.exchange.place_order(quantity = -entry(),price = 0, type_order='Market', side ='Sell')       
-                        self.exchange.place_order(quantity = entry(),price = self.actualPrice + 75,type_order='Stop',side ='Sell')
-                        self.exchange.place_order(quantity= entry(), price=self.actualPrice - 75,type_order = 'Limit', side = 'Sell', target= 'Sell')
-                        self.state_short = 2 
-
-                        telegram_message = "🚨 Short entry found for {0} at ${1}".format(
-                                settings.CLIENT_NAME,self.actualPrice)
-                        telegram_bot.send_group_message(msg =telegram_message)
-                else:
-                    self.state_short = 0
-                    self.state_long = 0
-
-            elif (self.positionContracts > 0 and self.state_long == 2) or (self.positionContracts < 0 and self.state_short == 2):
-                if self.amountOpenOrders != 2:
-                    self.exchange.cancel_every_order()
-                    self.state_short = 0
-                    self.state_long = 0
-        
-                
             if(self.available_margin['availableMargin'] > 0):
                 #Check user balance if theres money
                 self._profit_check()
@@ -524,23 +478,87 @@ class Carlao_Strategy:
                     self.daily_balance = self.wallet_amount
                     self.starting = False
 
-            
             # Check if bot is ON or OFF
             if not(operation):
                 self.logger.info("~: Bot is Paused :~")
             else:
                 self.logger.info("~: Bot is Running :~") 
 
-                # Check if user has minimun balance to operate
-                if(self.available_margin['availableMargin'] > settings.MIN_FUNDS):
-                	print('State Machine for bot operation')
-                	#TODO: Maquina de estados estratégia carlão
+                # # Check if user has minimun balance to operate
+                # if(self.available_margin['availableMargin'] > settings.MIN_FUNDS):
+                	
+                #Maquina de estados estratégia carlão
+                print('State Machine for bot operation')
+                if self.positionContracts == 0:
+            
+                    # self.exchange.place_order(quantity = self.quantity,price = 0, type_order='Market', side ='Buy')
+                    # telegram_message = "🚨 TESTE Long entry found for {0} at ${1}".format(
+                    #                 settings.CLIENT_NAME,self.actualPrice)
+                    # telegram_bot.send_group_message(msg =telegram_message)
 
-                else:
-                    self.logger.info('There are not enough funds on the account.')
-                    # telegram_bot.send_group_message(msg ='💲There are not enough funds on client {1} account, turning bot off.'.format(
-                    #                                 settings.CLIENT_NAME))
-                    raise SystemExit('Not enough funds on account')
+                    # self.exchange.place_order(quantity = -self.quantity,price = self.below_price,type_order='Stop',side ='Buy')
+                    # self.exchange.place_order(quantity= -self.quantity, price= self.above_price,type_order = 'Limit', side = 'Buy', target= 'Buy')
+
+                    # Long / Tendência de alta
+                    if self.MACD(self.candles,84,182,63) > 0 and self.sorting_index(self.candles) > 85:
+                        # Condição necessária  (convergência: linhas de mesmo sinal)
+                        if self.MACD(self.candles,7,14,13) > self.MACD(self.candles,84,182,63) and self.state_long == 0:
+                            self.state_long = 1
+
+                            telegram_message = 'STATE LONG 1 REACHED'
+                            telegram_bot.send_group_message(msg =telegram_message)
+
+                        # Condição suficiente 1 (princípio da divergência) (sinal opostos)
+                        if self.MACD(self.candles,7,14,13) < 0 and self.state_long == 1:
+                            self.exchange.place_order(quantity = self.quantity,price = 0, type_order='Market', side ='Buy')
+                            self.exchange.place_order(quantity = -self.quantity,price = self.below_price,type_order='Stop',side ='Buy')
+                            self.exchange.place_order(quantity= -self.quantity, price= self.above_price,type_order = 'Limit', side = 'Buy', target= 'Buy')
+                            self.state_long = 2
+                        
+                            telegram_message = "🚨 Long entry found for {0} at ${1}".format(
+                                        settings.CLIENT_NAME,self.actualPrice)
+                            telegram_bot.send_group_message(msg =telegram_message)
+
+                    # Short / Tendência de queda
+                    elif self.MACD(self.candles,84,182,63) < 0 and self.sorting_index(self.candles) < -85:
+                        # Condição necessária (convergência: linhas de mesmo sinal)
+                        if self.MACD(self.candles,7,14,13)< self.MACD(self.candles,84,182,63) and self.state_short == 0:
+                            self.state_short = 1
+
+                            telegram_message = 'STATE SHORT 1 REACHED'
+                            telegram_bot.send_group_message(msg =telegram_message)
+
+                        #  %Condição suficiente 1 (princípio da divergência) (sinais opostos)
+                        if self.MACD(self.candles,7,14,13) > 0 and self.state_short == 1:
+                            self.exchange.place_order(quantity = -self.quantity,price = 0, type_order='Market', side ='Sell')       
+                            self.exchange.place_order(quantity = self.quantity,price = self.above_price,type_order='Stop',side ='Sell')
+                            self.exchange.place_order(quantity= self.quantity,price = self.below_price,type_order = 'Limit', side = 'Sell', target= 'Sell')
+                            self.state_short = 2 
+
+                            telegram_message = "🚨 Short entry found for {0} at ${1}".format(
+                                    settings.CLIENT_NAME,self.actualPrice)
+                            telegram_bot.send_group_message(msg =telegram_message)
+                    else:
+                        if (self.state_short == 1) or (self.state_long == 1):
+                            telegram_message = 'NON TREND RESET AFTER STATE 1'
+                            telegram_bot.send_group_message(msg =telegram_message)
+                        self.state_short = 0
+                        self.state_long = 0
+
+                elif (self.positionContracts > 0 and self.state_long == 2) or (self.positionContracts < 0 and self.state_short == 2):
+                    if self.amountOpenOrders != 2:
+                        self.exchange.cancel_every_order()
+                        self.state_short = 0
+                        self.state_long = 0
+
+                        telegram_message = 'DIVERGANCE IN CONTRACTS, CANCELING ALL ORDERS AND RESET STATE'
+                        telegram_bot.send_group_message(msg =telegram_message)
+
+                # else:
+                #     self.logger.info('There are not enough funds on the account.')
+                #     # telegram_bot.send_group_message(msg ='💲There are not enough funds on client {1} account, turning bot off.'.format(
+                #     #                                 settings.CLIENT_NAME))
+                #     raise SystemExit('Not enough funds on account')
 
             self.logger.info("Waiting %d seconds ..." % settings.LOOP_INTERVAL)
             self._data_dump()# write data to dashboard status

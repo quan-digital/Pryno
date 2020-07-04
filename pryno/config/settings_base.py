@@ -6,8 +6,8 @@
 import pkg_resources  
 
 # API URL
-BASE_URL = "https://testnet.bitmex.com/api/v1/"
-# BASE_URL = "https://www.bitmex.com/api/v1/"
+# BASE_URL = "https://testnet.bitmex.com/api/v1/"
+BASE_URL = "https://www.bitmex.com/api/v1/"
 
 # Bot email
 CLIENT_NAME = ''
@@ -22,8 +22,6 @@ BITMEX_SECRET = ""
 # Operation Parameters
 #####################################################
 
-# Risk in percent for each trade
-RISK_PER_TRADE = 3
 
 # Number of steps with lower price step
 LOW_RISK_ORDER = 4  
@@ -33,8 +31,8 @@ ORDER_INCREASE_INTERVAL = 7
 #Contracts Percentual
 CONTRACT_PCT = 1.75/100
 #Activate Fixed Margin
-FIXED_MARGIN_FLAG = False
-ISOLATED_MARGIN_FACTOR = 0
+FIXED_MARGIN_FLAG = True
+ISOLATED_MARGIN_FACTOR = 10
 #Margin funds percentual to get for amount of contracts as steps increases, for dynamic contract steps 
 SMALL_CONTRACT = 0.215
 MEDIUM_CONTRACT = 0.2375
@@ -122,7 +120,7 @@ ADMIN_USERS = {
 POST_ONLY = False
 
 # Time interval to analyse candles
-CANDLE_TIME_INTERVAL = 130
+CANDLE_TIME_INTERVAL = 300
 
 # In seconds
 AUTH_EXPIRE_TIME = 10
