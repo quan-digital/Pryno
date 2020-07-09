@@ -1,4 +1,3 @@
-from pryno.util import tools
 from pryno.dashboard import app
 import subprocess
 import sys
@@ -18,6 +17,7 @@ import time
 import sys
 import os
 import pryno.telegram_bot.quan_bot as telegram_bot
+from pryno.util import tools
 
 
 def continuous_deployment():
