@@ -306,7 +306,7 @@ class BitMEX(object):
         arrayClose = []
         for candles in candlesHistory:
             arrayClose.append(candles['close'])
-        return arrayClose
+        return arrayClose[::-1]
 
     def get_operationParameters(self,symbol,count,size):
         candlesHistory = self.get_candles(symbol,count,size)

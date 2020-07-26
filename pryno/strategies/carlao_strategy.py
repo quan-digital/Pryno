@@ -418,19 +418,18 @@ class Carlao_Strategy:
             self.amountOpenOrders = len(self.openOrders)
 
             # Define  entry quantity, stop and target
-            self.quantity = round(tools.XBt_to_XBT(self.available_margin['availableMargin']) * self.actualPrice * settings.ISOLATED_MARGIN_FACTOR *0.98)
-            self.above_price = tools.toNearest(self.actualPrice * 1.003)
-            self.below_price = tools.toNearest(self.actualPrice * 0.997)
+            self.quantity = round(tools.XBt_to_XBT(self.available_margin['availableMargin']) * self.actualPrice * settings.ISOLATED_MARGIN_FACTOR *0.1)
+            self.above_price = tools.toNearest(self.actualPrice * 1.008)
+            self.below_price = tools.toNearest(self.actualPrice * 0.992)
 
             self.logger.info("/////////////////////////////")
             self.logger.info('------TESTE PARÂMETROS-------')
             self.logger.info("=============================")
             self.logger.info('Sorting Index: {}'.format(self.sorting_index(self.candles)))
-            self.logger.info('MACD Long: {}'.format(self.MACD(self.candles,84,182,63)))
-            self.logger.info('MACD Short: {}'.format(self.MACD(self.candles,7, 14, 13)))
+            self.logger.info('MACD Long: {}'.format(round(self.MACD(self.candles,84,182,63),3)))
+            self.logger.info('MACD Short: {}'.format(round(self.MACD(self.candles,7, 14, 13),3)))
             self.logger.info('walletBalance in Dol: {}'.format(tools.toNearest(tools.XBt_to_XBT(self.exchange.get_margin()['walletBalance']) * self.actualPrice)))
             self.logger.info('walletBalance in XBT: {}'.format(round(tools.XBt_to_XBT(self.exchange.get_margin()['walletBalance']),8)))
-            self.logger.info("/////////////////////////////")
             self.logger.info("/////////////////////////////")
             self.logger.info("/////////////////////////////")
             self.logger.info('position Contracts: {}'.format(self.positionContracts))
@@ -439,12 +438,9 @@ class Carlao_Strategy:
             self.logger.info('State Long: {}'.format(self.state_long))
             self.logger.info("/////////////////////////////")
             self.logger.info("/////////////////////////////")
-            self.logger.info("/////////////////////////////")
             self.logger.info('lquantity {}'.format(self.quantity))
             self.logger.info('above_price {}'.format(self.above_price))
             self.logger.info('below_price {}'.format(self.below_price))
-            self.logger.info("/////////////////////////////")
-            self.logger.info("/////////////////////////////")
             self.logger.info("/////////////////////////////")
 
             # If reached Stop Loss   
@@ -500,9 +496,9 @@ class Carlao_Strategy:
                     # self.exchange.place_order(quantity= -self.quantity, price= self.above_price,type_order = 'Limit', side = 'Buy', target= 'Buy')
 
                     # Long / Tendência de alta
-                    if self.MACD(self.candles,84,182,63) > 0 and self.sorting_index(self.candles) > 85:
+                    if self.MACD(self.candles,84,182,63) > 0:
                         # Condição necessária  (convergência: linhas de mesmo sinal)
-                        if self.MACD(self.candles,7,14,13) > self.MACD(self.candles,84,182,63) and self.state_long == 0:
+                        if self.MACD(self.candles,7,14,13) > self.MACD(self.candles,84,182,63) and self.state_long == 0 and self.sorting_index(self.candles) > 92:
                             self.state_long = 1
 
                             telegram_message = 'STATE LONG 1 REACHED'
@@ -520,9 +516,9 @@ class Carlao_Strategy:
                             telegram_bot.send_group_message(msg =telegram_message)
 
                     # Short / Tendência de queda
-                    elif self.MACD(self.candles,84,182,63) < 0 and self.sorting_index(self.candles) < -85:
+                    elif self.MACD(self.candles,84,182,63) < 0:
                         # Condição necessária (convergência: linhas de mesmo sinal)
-                        if self.MACD(self.candles,7,14,13)< self.MACD(self.candles,84,182,63) and self.state_short == 0:
+                        if self.MACD(self.candles,7,14,13)< self.MACD(self.candles,84,182,63) and self.state_short == 0 and self.sorting_index(self.candles) < -92:
                             self.state_short = 1
 
                             telegram_message = 'STATE SHORT 1 REACHED'
