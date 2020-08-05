@@ -3,6 +3,13 @@
 # - Pryno Position Strategy -
 # * Quan.digital *
 
+import pryno.telegram_bot.quan_bot as telegram_bot
+from pryno.database.mongo import RyngoDB
+from pryno.util.api_bitmex import BitMEX
+from pryno.util import settings
+from pryno.util import mail
+from pryno.util import tools
+from pryno.util import logger
 from time import sleep
 import datetime
 import sys
@@ -12,12 +19,7 @@ import random
 import atexit
 import traceback
 import json
-import pryno.util.mail as mail
-import pryno.util.tools as tools
-import pryno.util.settings as settings
-import pryno.telegram_bot.quan_bot as telegram_bot
-from pryno.util.api_bitmex import BitMEX
-from pryno.util import logger
+
 
 # Used for reloading the bot - saves modified times of key files
 watched_files_mtimes = [(f, getmtime(f)) for f in settings.WATCHED_FILES]
@@ -40,7 +42,8 @@ class PPS:
         self.wallet_logger = logger.setup_db('wallet')
         self.exec_logger = logger.setup_db('exec_http')
 
-        # Initialize exchange
+        # Initialize DB & exchange
+        self.mongo_client = RyngoDB()
         self.symbol = settings.SYMBOL
         self.exchange = BitMEX(base_url=bitmex_url,
                 symbol=self.symbol, apiKey=settings.BITMEX_KEY, apiSecret=settings.BITMEX_SECRET)
@@ -145,6 +148,8 @@ class PPS:
         current_status_path = settings.LOG_DIR + 'current_status.json'
         with open(current_status_path, 'w') as f:
             json.dump(status_dict, f)
+        self.mongo_client.insert_status(status_dict)
+        print('MONGO GONGO BONGO')
         return
 
     def _profit_check(self):
@@ -204,6 +209,7 @@ class PPS:
                     mail.send_email(mailMessage,settings.MAIL_ACTIVITY)
                     with open(charging_file_path,'w') as bills:
                         json.dump(chargefile,bills)
+                        self.mongo_client.insert_billing(chargefile)
 
                     newpayday = payday + datetime.timedelta(days=7)
                     checking_alterations['initialBalance'] = self.wallet_amount
@@ -221,6 +227,7 @@ class PPS:
                 with open(profit_file_path,'w') as f:
                     f.seek(0) 
                     json.dump(checking_alterations, f)
+                    self.mongo_client.insert_profit(checking_alterations)
 
         #Client first week with the bot operating at his account
         except FileNotFoundError:
@@ -238,6 +245,7 @@ class PPS:
 
             with open(profit_file_path,'w') as f:
                 json.dump(profit_data, f)
+                self.mongo_client.insert_profit(profit_data)
 
         #If profit check callback fails notify through email
         except: 
@@ -334,6 +342,16 @@ class PPS:
             settings.CLIENT_NAME,profit,tools.XBt_to_XBT(self.wallet_amount))
         telegram_bot.send_group_message(msg=message)
         sleep_time = random.uniform(0.1, 1)*self.SLEEP_TELEGRAM
+        today = datetime.datetime.today().strftime('%Y-%m-%d')            
+        profit_data = {
+                'daily_profit': self.wallet_amount -  self.daily_balance,
+                'timestamp': today,
+                'reference_balance': self.wallet_amount,
+                'initial_balance': self.wallet_amount
+            }
+
+        self.mongo_client.insert_profit_details(profit_data)
+
         sleep(sleep_time)
 
     def post_gradle_orders(self):
@@ -524,6 +542,9 @@ class PPS:
                 self.exec_logger.info("%s, %s, %s, %s, %s" %
                     (item['text'], item['side'], item['cumQty'], 
                         item['symbol'], item['stopPx'] if item['stopPx'] else (item['price'] or 0)))
+
+                self.mongo_client.insert_exec(dict(text=item['text'],cumQty=item['cumQty'],symbol=item['symbol'],
+                            stopPx_Price=item['stopPx'] if item['stopPx'] else (item['price'] or 0)))
 
             #Check notifications orders
             if item['cumQty'] > 0 and item['clOrdID'] != '':

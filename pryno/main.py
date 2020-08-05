@@ -66,6 +66,7 @@ if __name__ == '__main__':
 		mm.run_loop()
 	except (KeyboardInterrupt, SystemExit):
 		# mm.exchange.cancel_every_order()
+		print('Fudeu lele')
 		mm.exit()
 		# sys.exit()
 		# os.popen('killall python3')
