@@ -342,6 +342,16 @@ class PPS:
             settings.CLIENT_NAME,profit,tools.XBt_to_XBT(self.wallet_amount))
         telegram_bot.send_group_message(msg=message)
         sleep_time = random.uniform(0.1, 1)*self.SLEEP_TELEGRAM
+        today = datetime.datetime.today().strftime('%Y-%m-%d')            
+        profit_data = {
+                'daily_profit': self.wallet_amount -  self.daily_balance,
+                'timestamp': today,
+                'reference_balance': self.wallet_amount,
+                'initial_balance': self.wallet_amount
+            }
+
+        self.mongo_client.insert_profit_details(profit_data)
+
         sleep(sleep_time)
 
     def post_gradle_orders(self):

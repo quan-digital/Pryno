@@ -32,8 +32,8 @@ class RyngoDB():
 
     def setup_collections(self):
         self.capped_collection('status')
-        self.capped_collection('exec')
-        self.capped_collection('wallet')
+        self.capped_collection('trade_history')
+        self.capped_collection('profit_details')
 
     def insert_status(self, status_dict):
         self.user_db.status.insert_one(status_dict)
@@ -49,7 +49,10 @@ class RyngoDB():
 
     def insert_profit(self, profit_dict):
         self.user_db.profit.insert_one(profit_dict)
-    
+
+    def insert_profit_details(self, profit_dict):
+        self.user_db.profit_details.insert_one(profit_dict)
+
     def get_latest_instrument(self):
         self.kollecta_db.instrument.find_one(sort=[( '_id', pymongo.DESCENDING )])
 
