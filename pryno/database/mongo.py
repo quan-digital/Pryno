@@ -16,7 +16,7 @@ class RyngoDB():
 
     def make_client(self, db = 'rynotrove'):
         """Utility funciton to load MongoClient"""
-        with open('database/mongo-credentials.json', 'r') as f:
+        with open('pryno/database/mongo-credentials.json', 'r') as f:
             creds = json.load(f)
         client = pymongo.MongoClient(creds.get('conn-string-' + db))
         return client
@@ -68,10 +68,4 @@ if __name__ == "__main__":
     sample = dict(test=True)
     # mongo_client.capped_collection('test2', max_size=100000)
     # mongo_client.setup_collections()
-    # mongo_client.insert_status(sample)
-    # mongo_client.insert_exec(sample)
-    # mongo_client.insert_wallet(sample)
-    # mongo_client.insert_billing(sample)
-    # mongo_client.insert_profit(sample)
-
-    
+    mongo_client.insert_status(sample)

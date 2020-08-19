@@ -148,13 +148,13 @@ SYMBOL = "XBTUSD"
 BOT_NAME = "PPS"
 
 # path/to/logdir
-LOG_DIR = 'logs/'
+LOG_DIR = 'pryno/logs/'
 
 # Max file size in bytes
 MAX_FILE_SIZE = 100000000 # 100MB
 
 #path/to/financedir
-FIN_DIR = 'fin/'
+FIN_DIR = 'pryno/fin/'
 
 # Numbers of seconds in a day
 _SLEEP_FOR_ONE_DAY = 86400
