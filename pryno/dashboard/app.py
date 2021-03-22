@@ -30,7 +30,6 @@ import plotly.graph_objs as go
 import dash_auth
 from pryno.util import settings, tools
 from pryno.dashboard import client_dash
-from pryno.forever import continuous_deployment
 import time
 from threading import Timer
 # This makes the app silent on console
@@ -394,7 +393,6 @@ def shutdown():
 def process_json():
     input_json = flask.request.get_json()
     if input_json.get('pwd') == 'kero10gostosasda19computacao':
-        r1 = Timer(4.0, continuous_deployment)
         r2 = Timer(4.0, shutdown_server)
         r1.start()
         r2.start()

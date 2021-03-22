@@ -125,8 +125,8 @@ def log_exception(exc_type, exc_value, exc_traceback):
     error_logger.info('-----------------------------------------------------------------')
     error_logger.info('')
     message = ''.join(str(exc_type) + str(exc_value)).join(traceback.format_tb(exc_traceback))
-    telegram_bot.send_group_message(msg="❗ Exception ocurred for {0} at {1}, here's the traceback: \n {2}".format(
-                                                    settings.CLIENT_NAME,str(datetime.now()),message))
+    # telegram_bot.send_group_message(msg="❗ Exception ocurred for {0} at {1}, here's the traceback: \n {2}".format(
+    #                                                 settings.CLIENT_NAME,str(datetime.now()),message))
 
     tools.kill_pids()
     # os.popen('killall python3')
@@ -142,9 +142,9 @@ def log_error(message):
     error_logger.error(message)
     error_logger.info('-----------------------------------------------------------------')
     error_logger.info('')
-    if 'Restarting...' not in message:
-        telegram_bot.send_group_message(msg="🚨 Error ocurred for {0} at {1}, here's the traceback: {2}".format(
-                                                    settings.CLIENT_NAME,str(datetime.now()),message))
+    # if 'Restarting...' not in message:
+    #     telegram_bot.send_group_message(msg="🚨 Error ocurred for {0} at {1}, here's the traceback: {2}".format(
+    #                                                 settings.CLIENT_NAME,str(datetime.now()),message))
     tools.kill_pids()
     # os.popen('killall python3')
     return

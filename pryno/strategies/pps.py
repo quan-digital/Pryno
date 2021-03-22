@@ -3,8 +3,7 @@
 # - Pryno Position Strategy -
 # * Quan.digital *
 
-import pryno.telegram_bot.quan_bot as telegram_bot
-from pryno.database.mongo import RyngoDB
+
 from pryno.util.api_bitmex import BitMEX
 from pryno.util import settings
 from pryno.util import mail
@@ -43,7 +42,6 @@ class PPS:
         self.exec_logger = logger.setup_db('exec_http')
 
         # Initialize DB & exchange
-        self.mongo_client = RyngoDB()
         self.symbol = settings.SYMBOL
         self.exchange = BitMEX(base_url=bitmex_url,
                 symbol=self.symbol, apiKey=settings.BITMEX_KEY, apiSecret=settings.BITMEX_SECRET)
@@ -69,7 +67,6 @@ class PPS:
         self.botHighStepInfo = ''
         self.last_execution = ''
         self.position = []
-        self.first_time = True
         self.aboveHighStep = False
         self.step_number = 0
         self.starting = True
@@ -86,8 +83,6 @@ class PPS:
         except:
             self.botStopInfo = ''
 
-        telegram_bot.send_group_message(msg="🔁 Bot for {0} starting with strategy {1} v {2}".format(settings.CLIENT_NAME,
-                settings.STRATEGY_NAME, settings.BOT_VERSION))
 
         self.logger.info("-\*---------------------|Pryno|---------------------*/-")
         self.logger.info("-\*                        .                        */-")
@@ -148,8 +143,6 @@ class PPS:
         current_status_path = settings.LOG_DIR + 'current_status.json'
         with open(current_status_path, 'w') as f:
             json.dump(status_dict, f)
-        self.mongo_client.insert_status(status_dict)
-        print('MONGO GONGO BONGO')
         return
 
     def _profit_check(self):
@@ -180,7 +173,6 @@ class PPS:
                     checking_alterations['initialBalance'] = float(checking_alterations['initialBalance']) + delta
                     file_alter = True
                     # send thorugh telegram the deposited amount
-                    telegram_bot.send_group_message(msg ="🔽 Client {0} deposited XBT to his account. Satoshis: {1} xBT".format(settings.CLIENT_NAME, delta))
                 # Withdrawals
                 if wallet['withdrawn'] != checking_alterations['lastWithdrawal']:
                     delta = float(wallet['withdrawn']) - float(checking_alterations['lastWithdrawal'])
@@ -209,7 +201,6 @@ class PPS:
                     mail.send_email(mailMessage,settings.MAIL_ACTIVITY)
                     with open(charging_file_path,'w') as bills:
                         json.dump(chargefile,bills)
-                        self.mongo_client.insert_billing(chargefile)
 
                     newpayday = payday + datetime.timedelta(days=7)
                     checking_alterations['initialBalance'] = self.wallet_amount
@@ -227,7 +218,6 @@ class PPS:
                 with open(profit_file_path,'w') as f:
                     f.seek(0) 
                     json.dump(checking_alterations, f)
-                    self.mongo_client.insert_profit(checking_alterations)
 
         #Client first week with the bot operating at his account
         except FileNotFoundError:
@@ -245,7 +235,6 @@ class PPS:
 
             with open(profit_file_path,'w') as f:
                 json.dump(profit_data, f)
-                self.mongo_client.insert_profit(profit_data)
 
         #If profit check callback fails notify through email
         except: 
@@ -261,17 +250,13 @@ class PPS:
             if self.position[0]['currentQty'] == 0:
                 self.exchange.cancel_every_order()
                 self.logger.info('No positions, all orders cancelled.')
-                telegram_bot.send_group_message(msg=' ✅ No position, all orders cancelled and bot paused for {0}'.format(settings.CLIENT_NAME))
             else:
                 self.logger.warning('Position found, orders still active!')
                 mailMessage = str('🚨🚨🚨 Position found, and bot its turning off, orders still active for {0}:'.format(settings.CLIENT_NAME))
-                telegram_bot.send_group_message(msg =mailMessage)
                 #mail.send_email(mailMessage)
         else:
-            telegram_bot.send_group_message(msg ='✅ No position and no open orders, bot is shutting down for {0}'.format(settings.CLIENT_NAME))
-        # os.popen('killall python3')
-        # sys.exit(0)
-
+            self.logger.warning('Shuting down your system')
+            
     def prepare_order_dynamic(self,index,priceStep,one_time):
         '''
         This functions prepare orders with variated price step, starting with a range of 15$ for the
@@ -340,7 +325,6 @@ class PPS:
         message  = "☑️ A day has passed, now its {0}/{1} and {2} had a gain of {3:.2%},\
         now his balance is {4} XBT".format(str(message_time.month),str(message_time.day),
             settings.CLIENT_NAME,profit,tools.XBt_to_XBT(self.wallet_amount))
-        telegram_bot.send_group_message(msg=message)
         sleep_time = random.uniform(0.1, 1)*self.SLEEP_TELEGRAM
         today = datetime.datetime.today().strftime('%Y-%m-%d')            
         profit_data = {
@@ -350,14 +334,12 @@ class PPS:
                 'initial_balance': self.wallet_amount
             }
 
-        self.mongo_client.insert_profit_details(profit_data)
 
         sleep(sleep_time)
 
     def post_gradle_orders(self):
         '''Post gradle orders + stop to both sides'''
         orders = []
-        self.first_time = True
         if(self.amountOpenOrders != settings.TOTAL_STEP*2 + settings.STOP_MARKET_ORDERS):
             # Not idle and no gradle - anomaly
             if(self.amountOpenOrders > 0):
@@ -382,11 +364,6 @@ class PPS:
                             if(self.volumeActual > 0 and self.actualPrice > 0):
                                 self.stopSet = 0
                                 self.totalContracts = 0
-                                #Telegram send message when orders are being opened
-                                # telegram_bot.send_group_message(msg = 'The bot from {0} is opening orders \
-                                # 	bitcoin price is {1} and for the server is {2}'.format(settings.CLIENT_NAME,self.actualPrice,datetime.datetime.now()))
-                                #Contract amount to get for each gradle order
-                                #0.215
                                 if(settings.ISOLATED_MARGIN_FACTOR > 1):
                                     self._contractStep = round(settings.ISOLATED_MARGIN_FACTOR*settings.CONTRACT_PCT*self.actualPrice*tools.XBt_to_XBT(self.available_margin['availableMargin']))/settings.RISK_DIVISOR
                                     #Specific setup for Mac-10 testing
@@ -425,9 +402,6 @@ class PPS:
                 if(self.position[0]['currentQty'] == 0 ):
                     self.logger.info("Bitmex flow is too innocuous, halting every order")
                     self.exchange.cancel_every_order()
-                    message = "🔑 Lock anomaly is true. No position, all orders cancelled for {}.".format(settings.CLIENT_NAME)
-                    telegram_bot.send_group_message(msg= message,bot_token=settings.DEBUGGER_BOT,chat_id=settings.DEBUGGER_BOT_GROUP)
-
     def position_loop(self,side):
         '''Buy/sell position loop
         Cancel opposite side orders, post target and stop market'''
@@ -481,24 +455,17 @@ class PPS:
                     self.logger.info("Position price is {0}".format(self.positionPrice))
                 orderTarget = self.exchange.place_order(-self.position[0]['currentQty'], switchOpenOrder.get(side),target = side)
                 self.logger.info("Placing target at {0}".format(orderTarget))
-                telegram_bot.send_group_message(msg = '🔥 The bot from {0} is setting a new target \
-                        in the value {1} at {2} on server time'.format(settings.CLIENT_NAME,orderTarget,datetime.datetime.now()),
-                        bot_token = settings.DEBUGGER_BOT,chat_id=settings.DEBUGGER_BOT_GROUP)
+
                 logger.log_orders(orderTarget)
                 settings._REACHED_TARGET = True
         #This is for canceling order gradle before
-        if(self.operationParameters['lockAnomaly'] and self.first_time):
+        if(self.operationParameters['lockAnomaly'] ):
             if(not self.aboveHighStep):
-                # telegram_bot.send_group_message("Lock anomaly is true and bot is in position for {} \
-                # 	, canceling all gradle orders please watch the bot".format(settings.CLIENT_NAME))
-                # self.exchange.cancel_every_order()
-                telegram_bot.send_group_message("🔒 Lock anomaly is true and bot is in position for {0}, below highStep : {1}. Volume spike: {2}".format(
-                                                    settings.CLIENT_NAME,self.step_number,self.operationParameters.get('major_volume',0)))
-                self.first_time = False
+                self.logger.info('Lock anomaly is true and bot is above highStep')
             else:
-                telegram_bot.send_group_message("🔏  Lock anomaly is true and bot is in position for {0},\
-                    over highStep : {1}. Volume spike: {2}".format(settings.CLIENT_NAME,self.step_number,self.operationParameters.get('major_volume',0)))
+                self.logger.info('Lock anomaly is true and bot is below highStep')
 
+                
     def stop_market(self,side):
         '''
             Create the stop markets Orders to aviod account liquidation
@@ -542,9 +509,6 @@ class PPS:
                 self.exec_logger.info("%s, %s, %s, %s, %s" %
                     (item['text'], item['side'], item['cumQty'], 
                         item['symbol'], item['stopPx'] if item['stopPx'] else (item['price'] or 0)))
-
-                self.mongo_client.insert_exec(dict(text=item['text'],cumQty=item['cumQty'],symbol=item['symbol'],
-                            stopPx_Price=item['stopPx'] if item['stopPx'] else (item['price'] or 0)))
 
             #Check notifications orders
             if item['cumQty'] > 0 and item['clOrdID'] != '':
@@ -614,9 +578,8 @@ class PPS:
             self.operationParameters = self.exchange.get_operationParameters("XBTUSD", settings.CANDLE_TIME_INTERVAL, "1m")
             self.actualPrice = self.operationParameters['lastPrice']
             self.volumeActual = round(self.operationParameters['volume'])
-            #telegram_bot.send_group_message('the actual price {} for {}, '.format(self.actualPrice,settings.CLIENT_NAME))		
-
-            # Requesting HTTP needed info for bot operation
+            
+                        # Requesting HTTP needed info for bot operation
             self.available_margin = self.exchange.get_margin()
             self.position = self.exchange.http_get_position()
             self.instrument = self.exchange.get_instrument()[0]
@@ -681,7 +644,6 @@ class PPS:
                 self.logger.info("High step order executed, alerting bot masters")
                 mailMessage = "⚠️ High step order executed for {0}. Step: {1}. Price: {2}.".format(
                                     settings.CLIENT_NAME,self.step_number,self.botHighStepInfo.get('price',None))
-                telegram_bot.send_group_message(msg =mailMessage)
                 settings._HIGH_STEP_ORDER = False
 
             #Notify if client been stopped
@@ -695,9 +657,7 @@ class PPS:
                 loss = (self.available_margin['walletBalance'] - initial_balance)/initial_balance
                 mailMessage = str("Stop order executed for {} couldnt detect the further stop info".format(settings.CLIENT_NAME))
                 if(self.botStopInfo != ''):
-                    telegram_message = "🛑 Stop order executed for {0}. stopPx: {1}. Percentage lost: {2:.2%}".format(
-                                    settings.CLIENT_NAME,self.botStopInfo.get("stopPx",None),loss)
-                    telegram_bot.send_group_message(msg =telegram_message)
+        
                     mail.send_email(telegram_message)
                 else:
                     mail.send_email(mailMessage)
@@ -729,8 +689,6 @@ class PPS:
                         self.position_loop('Sell')
                 else:
                     self.logger.info('There are not enough funds on the account.')
-                    telegram_bot.send_group_message(msg ='💲There are not enough funds on client {1} account, turning bot off.'.format(
-                                                    settings.CLIENT_NAME))
                     raise SystemExit('Not enough funds on account')
 
             self.logger.info("Waiting %d seconds ..." % settings.LOOP_INTERVAL)

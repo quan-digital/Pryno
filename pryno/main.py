@@ -10,7 +10,7 @@ try:
 except:
 	print('No settings.py found!')
 	from pryno.config import configure
-	configure.create_settings(base_path='pryno/config/settings_base.py', config_path='pryno/config/config.json' , out_path = 'pryno/util/settings.py')
+	configure.create_settings(base_path='config/settings_base.py', config_path='config/config.json' , out_path = 'util/settings.py')
 	from pryno.util import settings
 	settings.VALID_USERNAME_PASSWORD_PAIRS.update({settings.CLIENT_NAME: settings.CLIENT_PWD})
 
@@ -50,7 +50,7 @@ if __name__ == '__main__':
 		logger.setup_logger()
 		tools.create_dirs()
 		# Build new settings to handle updates
-		configure.create_settings(base_path='pryno/config/settings_base.py', config_path='pryno/config/config.json', out_path='pryno/util/settings.py')
+		configure.create_settings(base_path='config/settings_base.py', config_path='config/config.json', out_path='util/settings.py')
 		settings.VALID_USERNAME_PASSWORD_PAIRS.update({settings.CLIENT_NAME: settings.CLIENT_PWD})
 		settings.STM_INDICATOR_INIT = len(settings.BOT_NAME) + len(settings.BOT_VERSION) + 2
 		settings.GRADLE_INDICATOR_INIT = len(settings.BOT_NAME) + len(settings.BOT_VERSION) + 2
@@ -59,14 +59,13 @@ if __name__ == '__main__':
 		settings.STM_NUMBER = settings.STM_INDICATOR_END
 		settings.GRADLE_NUMBER = settings.GRADLE_INDICATOR_END
 		pid = os.getpid()
-		with open('pryno/pids/bot.pid', 'w') as w:
+		with open('pids/bot.pid', 'w') as w:
 			w.write(str(pid))
 		mm = pps.PPS(settings.BASE_URL)
-		Thread(target=app.run_server).start()
+		# Thread(target=app.run_server).start()
 		mm.run_loop()
 	except (KeyboardInterrupt, SystemExit):
 		# mm.exchange.cancel_every_order()
-		print('Fudeu lele')
 		mm.exit()
 		# sys.exit()
 		# os.popen('killall python3')
