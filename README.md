@@ -58,13 +58,13 @@ Then run the following steps:
     git checkout -b develop-test
     ```
 
-4. Start a python virtual enviroment with [venv](https://docs.python.org/pt-br/3/library/venv.html):
+4. Start a python virtual environment with [venv](https://docs.python.org/pt-br/3/library/venv.html):
 
     ```shell
-    python3 -m venv prynoenv 
+    python3 -m venv venv 
     ```
 
-5. Activate the enviroment: 
+5. Activate the environment: 
 
     ```shell
     source venv/bin/activate
