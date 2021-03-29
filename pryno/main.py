@@ -62,7 +62,8 @@ if __name__ == '__main__':
 		with open('pids/bot.pid', 'w') as w:
 			w.write(str(pid))
 		mm = pps.PPS(settings.BASE_URL)
-		# Thread(target=app.run_server).start()
+		start_dashboard_server = True
+		Thread(target=app.run_server).start() if start_dashboard_server else False
 		mm.run_loop()
 	except (KeyboardInterrupt, SystemExit):
 		# mm.exchange.cancel_every_order()

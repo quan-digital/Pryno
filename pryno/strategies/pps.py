@@ -6,7 +6,6 @@
 
 from pryno.util.api_bitmex import BitMEX
 from pryno.util import settings
-from pryno.util import mail
 from pryno.util import tools
 from pryno.util import logger
 from time import sleep

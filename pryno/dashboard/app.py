@@ -20,14 +20,14 @@ import schedule
 import requests
 import logging
 import flask
-from flask_login import user_logged_in
+# from flask_login import user_logged_in
 from flask import Flask, request
 import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
-import dash_auth
+# import dash_auth
 from pryno.util import settings, tools
 from pryno.dashboard import client_dash
 import time
@@ -50,10 +50,7 @@ HOST = '0.0.0.0'
 
 # Creating webapp
 app = dash.Dash(__name__)
-auth = dash_auth.BasicAuth(
-    app,
-    settings.VALID_USERNAME_PASSWORD_PAIRS
-)
+
 server = app.server
 
 # Datetime update
@@ -367,7 +364,20 @@ def check_button_user(n):
 
 
 def run_server():
-    print("Dashboard app server started running.")
+    print(f"""
+    
+    Dashboard app server started running!
+
+    _____________________________________________________ 
+                                                      
+            Access URL:                                
+            -------------------------------            
+            Localhost: http://127.0.0.1:{PORT}             
+                                                      
+    _____________________________________________________
+
+    
+    """)
     pid = os.getpid()
     response = os.popen("ps -ef | grep python")
     print(response)

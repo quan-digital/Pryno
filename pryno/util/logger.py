@@ -10,7 +10,7 @@ import os
 from logging.handlers import RotatingFileHandler
 from datetime import datetime
 from pryno.util import settings, tools
-from pryno.telegram_bot import quan_bot as telegram_bot
+# from pryno.telegram_bot import quan_bot as telegram_bot
 
 def setup_logger():
     '''Prints logger info to terminal'''

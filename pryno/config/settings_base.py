@@ -37,7 +37,7 @@ SMALL_CONTRACT = 0.215
 MEDIUM_CONTRACT = 0.2375
 LARGE_CONTRACT = 0.3 
 # Enable=1 or disable=0 volume profile and amplitude 
-ENABLE_VOLUMAMP = 1
+ENABLE_VOLUMAMP = 0
 MIN_DM = 1450000
 MIN_DM_CANCEL = 800000
 MAX_VOLUME = 11450000
@@ -55,7 +55,7 @@ PROFIT_TARGET = 2
 RISK_DIVISOR = 1
 
 # Percentage of actual price to calculate order step
-STEP_PCT = 0.0043
+STEP_PCT = 0.0013
 
 # Number of steps on each gradle side
 TOTAL_STEP = 5
@@ -188,15 +188,6 @@ GRADLE_NUMBER = 0
 BOT_MAIL = "pipryno@gmail.com"
 BOT_PWD = "SurubaoParaiso123"
 # Birth date 10/03/2000
-
-# Email receipients
-MAIL_TO_ERROR = ['kauecano@gmail.com', 'claudiocarvalhovilasboas@gmail.com']
-MAIL_ACTIVITY = ['kauecano@gmail.com', 'claudiocarvalhovilasboas@gmail.com','antoniodelimaesilva@gmail.com','alexandre.c.bandarra01@gmail.com']
-
-#Telegram Bots Token
-TOKEN_MAIN_BOT = "1199841211:AAHi1GPjTQJ0dkBTTXSm8zHcQEUzIwBThcs"
-DEBUGGER_BOT = "1242980549:AAHuWBWEo33pViTpHxMeeN97gCs5V7YHDlA"
-DEBUGGER_BOT_GROUP = -459197842
 
 
 
