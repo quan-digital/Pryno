@@ -86,10 +86,8 @@ git clone https://github.com/quan-digital/Pryno.git && cp config.json Pryno/pryn
 
 To build the application,  go to folder `./Pryno/pryno` and execute `main.py` file:
 
-    ```shell
+    ``` shell
     cd ./Pryno/pryno && python3 main.py
     ```
 
-Now, you can see the application running in your terminal, and the dashboard is running on localhost  ´http://127.0.0.1:80´
-
-### Getting started 
+Now, you can see the application running in your terminal, and the dashboard is running on [http://127.0.0.1:80](http://127.0.0.1:80)
