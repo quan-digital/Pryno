@@ -197,7 +197,7 @@ class PPS:
                     mailMessage = str("Hello Admins," \
                     + " it's payday and {0} owns us a total of {1} BTC,".format(checking_alterations['clientName'], tools.XBt_to_XBT(client_debt)) \
                     + " his total profit was {0}".format(tools.XBt_to_XBT(totalProfit)))
-                    mail.send_email(mailMessage,settings.MAIL_ACTIVITY)
+                    # mail.send_email(mailMessage,settings.MAIL_ACTIVITY)
                     with open(charging_file_path,'w') as bills:
                         json.dump(chargefile,bills)
 
@@ -237,8 +237,7 @@ class PPS:
 
         #If profit check callback fails notify through email
         except: 
-            mail.send_email('Some weird error at \
-                                Profit check {0} '.format(traceback.format_exc()), settings.MAIL_TO_ERROR)
+            print('Some weird error at Profit check {0} '.format(traceback.format_exc()))
 
     def exit(self):
         self.__on_close()
@@ -251,8 +250,7 @@ class PPS:
                 self.logger.info('No positions, all orders cancelled.')
             else:
                 self.logger.warning('Position found, orders still active!')
-                mailMessage = str('🚨🚨🚨 Position found, and bot its turning off, orders still active for {0}:'.format(settings.CLIENT_NAME))
-                #mail.send_email(mailMessage)
+   
         else:
             self.logger.warning('Shuting down your system')
             
@@ -656,10 +654,9 @@ class PPS:
                 loss = (self.available_margin['walletBalance'] - initial_balance)/initial_balance
                 mailMessage = str("Stop order executed for {} couldnt detect the further stop info".format(settings.CLIENT_NAME))
                 if(self.botStopInfo != ''):
-        
-                    mail.send_email(telegram_message)
+                    self.logger.info('Bot stopped, check log')
                 else:
-                    mail.send_email(mailMessage)
+                    self.logger.info('Check logs')
                 self.logger.info("Stop order executed, halting bot for 1 day.")
                 self.exchange.cancel_every_order()
                 sleep(settings._SLEEP_FOR_ONE_DAY)

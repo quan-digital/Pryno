@@ -55,7 +55,7 @@ PROFIT_TARGET = 2
 RISK_DIVISOR = 1
 
 # Percentage of actual price to calculate order step
-STEP_PCT = 0.0013
+STEP_PCT = 0.0043
 
 # Number of steps on each gradle side
 TOTAL_STEP = 5

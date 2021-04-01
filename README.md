@@ -15,7 +15,7 @@ Tons of awesome Github Actions integrated. Autopep, Intellicode
 
 Wallpaper art found [here](http://www.wallpaperswebs.com/rhino-art/).
 
-# Getting started instructions
+# Instalation
 
 Before starting, if you are running this bot in a Windows system be aware to change to the appropriate commands.
 
@@ -76,14 +76,20 @@ Then run the following steps:
     cd ../ && pip3 install -e Pryno
     ```
 
-7. Turn to folder `./Pryno/pryno` and execute `main.py` file to build the application:
+Instead, you can execute the previous commands at once by running the code below:
+
+```shell
+git clone https://github.com/quan-digital/Pryno.git && cp config.json Pryno/pryno/config && cd Pryno  && git checkout -b develop-test && python3 -m venv venv && source venv/bin/activate && cd ../ && pip3 install -e Pryno && cd ./Pryno/pryno
+```
+
+## Usage
+
+To build the application,  go to folder `./Pryno/pryno` and execute `main.py` file:
 
     ```shell
     cd ./Pryno/pryno && python3 main.py
     ```
 
-Instead, you can execute the previous commands at once by running the code below:
+Now, you can see the application running in your terminal, and the dashboard is running on localhost  ´http://127.0.0.1:80´
 
-```shell
-git clone https://github.com/quan-digital/Pryno.git && cp config.json Pryno/pryno/config && cd Pryno  && git checkout -b develop-test && python3 -m venv venv && source venv/bin/activate && cd ../ && pip3 install -e Pryno && cd ./Pryno/pryno && python3 main.py
-```
+### Getting started 
