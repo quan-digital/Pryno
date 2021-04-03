@@ -291,33 +291,6 @@ def make_btc_figure(n):
     return figure
 
 
-@app.callback(dash.dependencies.Output('pause_message', 'children'),
-              [dash.dependencies.Input('pause_button', 'n_clicks'),
-              dash.dependencies.Input('pause_confirm', 'cancel_n_clicks_timestamp'),
-              dash.dependencies.Input('pause_confirm', 'submit_n_clicks_timestamp')])
-def update_output(n_clicks, cancel_n_clicks_timestamp, submit_n_clicks_timestamp):
-    '''Bot operation button handling.'''
-    username = flask.request.authorization['username']
-    if not(cancel_n_clicks_timestamp):
-        cancel_n_clicks_timestamp = 1
-    if not(submit_n_clicks_timestamp):
-        submit_n_clicks_timestamp = 1
-    if n_clicks:
-        if username in settings.ADMIN_USERS:
-            if submit_n_clicks_timestamp > cancel_n_clicks_timestamp:
-                with open(settings.LOG_DIR + 'operation.json', 'w') as op:
-                    json.dump(dict(operation = True), op)
-                settings._PAUSE_BOT = False
-                return
-            else:
-                with open(settings.LOG_DIR + 'operation.json', 'w') as op:
-                    json.dump(dict(operation = False), op)
-                settings._PAUSE_BOT = True
-                return
-        else:
-            return
-    else:
-        return
 
 
 @app.callback([dash.dependencies.Output('html_p1', 'children'),
@@ -326,18 +299,18 @@ def update_output(n_clicks, cancel_n_clicks_timestamp, submit_n_clicks_timestamp
     dash.dependencies.Output('html_p4', 'children'),
     dash.dependencies.Output('html_p5', 'children')],
     [Input('interval-component', 'n_intervals')])
-def check_user_privilege(n):
+def Set_Debug_Mode(n):
     '''Check user admin level and render dashboard accordingly.'''
-    username = flask.request.authorization['username']
-    if username in settings.ADMIN_USERS:
-        settings.DEBUG_DASH = True
+    settings.DEBUG_DASH = True #change this accordingly with the information you desire to see on Dashboard
+    # if Debug is false you see another set of information at user screen
+    if settings.DEBUG_DASH:
         html_p1 = 'Volume'
         html_p2 = 'Amplitude'
         html_p3 = 'Dollar Minute'
         html_p4 = 'Lock Anomaly'
         html_p5 = 'Errors'
     else:
-        settings.DEBUG_DASH = False
+
         html_p1 = 'Funding'
         html_p2 = 'Leverage'
         html_p3 = 'Avg Entry'
@@ -346,16 +319,7 @@ def check_user_privilege(n):
     return [html_p1, html_p2, html_p3, html_p4, html_p5]
 
 
-@app.callback([dash.dependencies.Output('button_name','children')],
-              [Input('interval-component', 'n_intervals')])
-def check_button_user(n):
-    '''Check user admin level and render run button accordingly.'''
-    username = flask.request.authorization['username']
-    if username in settings.ADMIN_USERS:
-        bn = 'Run Bot'
-    else:
-        bn = 'In development'
-    return [bn]
+
 
 # -----------------------------------------------------------------------------------------
 # ----------------------- Server Functions ------------------------------------------------

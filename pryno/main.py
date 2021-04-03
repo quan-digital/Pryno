@@ -29,6 +29,7 @@ def build_bot():
 		return False
 
 
+#Test to call if you want only run the strategy
 def build_mm():
 	try:
 		mm = pps.PPS()
@@ -37,6 +38,7 @@ def build_mm():
 		return False
 
 
+#Test to call if you want only build server alone
 def build_app():
 	try:
 		Thread(target=app.run_server).start()
@@ -45,6 +47,8 @@ def build_app():
 		return False
 
 
+
+#Main test to check strategy + dashboard running
 if __name__ == '__main__':
 	try:
 		logger.setup_logger()

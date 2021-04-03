@@ -30,7 +30,6 @@ class PPS:
         logger.setup_error_logger()
         sys.excepthook = logger.log_exception
         atexit.register(self.__on_close)
-        # self.logger = logger.setup_logger()
         self.logger = logger.setup_logbook(name="pps")
         self.logger.info("Pryno is starting.")
         self.SLEEP_TELEGRAM = settings.SLEEP_TELEGRAM
@@ -40,7 +39,7 @@ class PPS:
         self.wallet_logger = logger.setup_db('wallet')
         self.exec_logger = logger.setup_db('exec_http')
 
-        # Initialize DB & exchange
+        # Initialize exchange
         self.symbol = settings.SYMBOL
         self.exchange = BitMEX(base_url=bitmex_url,
                 symbol=self.symbol, apiKey=settings.BITMEX_KEY, apiSecret=settings.BITMEX_SECRET)
@@ -144,6 +143,7 @@ class PPS:
             json.dump(status_dict, f)
         return
 
+
     def _profit_check(self):
         '''
         This function is responsible for all the profit logic, getting information
@@ -151,9 +151,7 @@ class PPS:
         '''
         # Path for user balance information
         profit_file_path = settings.FIN_DIR + 'initialBalance.json'
-
-        # Path for register the billing invoice from the client
-        charging_file_path = settings.FIN_DIR + 'biling/'
+        client_file_data = settings.FIN_DIR 
         # getting bitmex wallet information
         wallet = self.exchange.get_funds()
         file_alter = False
@@ -163,7 +161,7 @@ class PPS:
         try:
             with open(profit_file_path) as f:
                 checking_alterations = json.loads(f.read())
-                payday = datetime.datetime.strptime(checking_alterations['dueDate'], "%Y-%m-%d %H:%M:%S.%f")
+                weeklyProfit = datetime.datetime.strptime(checking_alterations['dueDate'], "%Y-%m-%d %H:%M:%S.%f")
 
                 # Deposits
                 if wallet['deposited'] != checking_alterations['lastDeposit']:
@@ -171,46 +169,33 @@ class PPS:
                     checking_alterations['lastDeposit'] = wallet['deposited']
                     checking_alterations['initialBalance'] = float(checking_alterations['initialBalance']) + delta
                     file_alter = True
-                    # send thorugh telegram the deposited amount
+
                 # Withdrawals
                 if wallet['withdrawn'] != checking_alterations['lastWithdrawal']:
                     delta = float(wallet['withdrawn']) - float(checking_alterations['lastWithdrawal'])
                     checking_alterations['lastWithdrawal'] = wallet['withdrawn']
                     checking_alterations['initialBalance'] = float(checking_alterations['initialBalance']) - delta
                     file_alter = True
-                    telegram_bot.send_group_message(msg ="🔼 Client {0} withdrew {1} XBT from his account. Balance: {2} XBT.".format(settings.CLIENT_NAME, tools.XBt_to_XBT(delta), tools.XBt_to_XBT(float(checking_alterations['initialBalance']))))
-                # Register the amount owed from client to us and renew bot operation for the next week to come
-                if  payday < datetime.datetime.now():
+
+                if  weeklyProfit < datetime.datetime.now():
                     start_date = datetime.datetime.strptime(checking_alterations['timestamp'],"%Y-%m-%d %H:%M:%S.%f")
                     totalProfit = float(self.wallet_amount) - float(checking_alterations['initialBalance'])
-                    client_debt = totalProfit/2
-                    self.logger.info('Mister {0} owns Quan Digital a total of {1} BTC'.format(checking_alterations['clientName'], tools.XBt_to_XBT(client_debt)))
-                    operationweek = int((payday-start_date).days/7)
-                    charging_file_path = charging_file_path + 'week' + str(operationweek)
-                    chargefile = {
+                    self.logger.info('Mister {0} profited a total of {1} BTC with this Strategy'.format(checking_alterations['clientName'], tools.XBt_to_XBT(totalProfit)))
+                    operationweek = int((weeklyProfit-start_date).days/7)
+                    client_file_data = client_file_data + 'week' + str(operationweek)
+                    client_Data = {
                         'totalProfit': totalProfit,
-                        'client_debt': client_debt,
                         'client_name': settings.CLIENT_NAME,
                         'profit_file_last_week': checking_alterations
                     }
-                    #Mail the Quan board about the amount owed
-                    mailMessage = str("Hello Admins," \
-                    + " it's payday and {0} owns us a total of {1} BTC,".format(checking_alterations['clientName'], tools.XBt_to_XBT(client_debt)) \
-                    + " his total profit was {0}".format(tools.XBt_to_XBT(totalProfit)))
-                    # mail.send_email(mailMessage,settings.MAIL_ACTIVITY)
-                    with open(charging_file_path,'w') as bills:
-                        json.dump(chargefile,bills)
 
-                    newpayday = payday + datetime.timedelta(days=7)
+                    with open(client_file_data,'w') as week:
+                        json.dump(client_Datas,week)
+
+                    nextweeklyProfit = weeklyProfit + datetime.timedelta(days=7)
                     checking_alterations['initialBalance'] = self.wallet_amount
-                    checking_alterations['dueDate'] = str(newpayday)
+                    checking_alterations['dueDate'] = str(nextweeklyProfit)
                     file_alter = True
-                    # #---------------TODO--------------------------------------------
-                    #create condition do raise up risk divisor after 24 hours and stop it after 4 days
-                    #probably schedule a function for it and set a boolean true with a timestamp
-                    # we could link with deposit check or simple button confirmation at admin dashboard
-                    #send email automatically(probably only after infra ready) but get the quan billing template and rewrite on the needed fields
-                    #if you read this congratulation!! sent me a message saying 'alleblaus hot potatto' so I can see that you're cool
 
             #If there's change write again over balance file
             if(file_alter == True):
@@ -221,14 +206,14 @@ class PPS:
         #Client first week with the bot operating at his account
         except FileNotFoundError:
             start_date = datetime.datetime.now()
-            payday = start_date + datetime.timedelta(days=7)
+            weeklyProfit = start_date + datetime.timedelta(days=7)
             #wallet = self.exchange.get_funds()
             profit_data = {
                 'timestamp': str(start_date),
                 'initialBalance': self.wallet_amount,
                 'lastDeposit': wallet['deposited'],
                 'lastWithdrawal': wallet['withdrawn'],
-                'dueDate': str(payday),
+                'dueDate': str(weeklyProfit),
                 'clientName': settings.CLIENT_NAME 
             }
 
@@ -238,6 +223,7 @@ class PPS:
         #If profit check callback fails notify through email
         except: 
             print('Some weird error at Profit check {0} '.format(traceback.format_exc()))
+
 
     def exit(self):
         self.__on_close()
@@ -310,29 +296,6 @@ class PPS:
             contract = round(self.c_old*1.5)
         return contract
 
-    def daily_digest(self):
-        '''Daily profits digest for bot.'''
-
-        profit_file_path = settings.FIN_DIR + 'initialBalance.json'
-        with open(profit_file_path,'r') as f:
-            client_info = json.loads(f.read())
-
-        message_time = datetime.datetime.now()
-        profit = (self.wallet_amount - self.daily_balance)/self.daily_balance 
-        message  = "☑️ A day has passed, now its {0}/{1} and {2} had a gain of {3:.2%},\
-        now his balance is {4} XBT".format(str(message_time.month),str(message_time.day),
-            settings.CLIENT_NAME,profit,tools.XBt_to_XBT(self.wallet_amount))
-        sleep_time = random.uniform(0.1, 1)*self.SLEEP_TELEGRAM
-        today = datetime.datetime.today().strftime('%Y-%m-%d')            
-        profit_data = {
-                'daily_profit': self.wallet_amount -  self.daily_balance,
-                'timestamp': today,
-                'reference_balance': self.wallet_amount,
-                'initial_balance': self.wallet_amount
-            }
-
-
-        sleep(sleep_time)
 
     def post_gradle_orders(self):
         '''Post gradle orders + stop to both sides'''
@@ -696,7 +659,6 @@ class PPS:
             if not(os.path.exists(res_path)):
                 sleep_time = random.uniform(0.1, 1)*self.SLEEP_TELEGRAM
                 sleep(sleep_time)
-                self.daily_digest()
                 self.logger.warning('Day changed.')
                 logger.log_error('Restarting...')
                 sleep(self.SLEEP_TELEGRAM)
