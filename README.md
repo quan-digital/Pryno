@@ -1,4 +1,5 @@
 # Quan Digital's Pryno
+Autonomous trading bot for Bitmex
 The ultimate crypto bot dev package - Trading Infrastructure + Dashboard + Telegram Bot🦏🔥🚀
 
 <img src="img/cover.jpg" align="center" />
