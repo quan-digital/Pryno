@@ -189,19 +189,7 @@ To build the application,  go to folder `./Pryno/pryno` and execute `main.py` fi
 
 Now, you can see the application running in your terminal, and the dashboard is running on [http://127.0.0.1:80](http://127.0.0.1:80)
 
-## LongTime Usage
 
-If you already tested the application and created a cloud server instance to leave your bot running for a couple of weeks (and maybe have some profits), use the below command to start your application instance as a subprocess:
-
- ``` shell
-    cd ./Pryno/pryno && python3 forever.py main.py
-    ```
-
-Also refer to this link it will help you detach your terminal screen and leave the code running well even after you logout from your server:
-
-[https://arnab-k.medium.com/how-to-keep-processes-running-after-ending-ssh-session-c836010b26a3](keep processes after ending ssh session)
-
-You can leave it long running at your computer, we tested running this bot on aws with a ec2 t2.micro free tier instance and it was more then enough
 
 ## Working Example
 
@@ -213,5 +201,20 @@ This is how your should look like after you are running the application:
 You can check informations about the states in the terminal session and also on bitmex as showed below:
 
 <img src="img/bitmex.jpg" align="center" />
+
+## LongTime Usage
+
+If you already tested the application and created a cloud server instance to leave your bot running for a couple of weeks (and maybe have some profits), use the below command to start your application instance as a subprocess:
+
+ ``` shell
+    cd ./Pryno/pryno && python3 forever.py main.py
+   
+    ```
+
+Also refer to this link it will help you detach your terminal screen and leave the code running well even after you logout from your server:
+
+[https://arnab-k.medium.com/how-to-keep-processes-running-after-ending-ssh-session-c836010b26a3](keep processes after ending ssh session)
+
+You can leave it long running at your computer, we tested running this bot on aws with a ec2 t2.micro free tier instance and it was more then enough
 
 Good Profits and may the force be with you!
