@@ -363,10 +363,13 @@ def shutdown():
     return 'Server shutting down...'
 
 
+
+#endpoint to reset bot process, if some server update or thing like that is sent
 @server.route('/reset', methods=['POST'])
 def process_json():
     input_json = flask.request.get_json()
-    if input_json.get('pwd') == 'kero10gostosasda19computacao':
+    # the pwd parameter is hardcoded for now
+    if input_json.get('pwd') == 'bot_Reset':
         r2 = Timer(4.0, shutdown_server)
         r1.start()
         r2.start()
@@ -375,6 +378,8 @@ def process_json():
         return 'Wrong credentials', 400
 
 
+
+# the below routes are for checkin applications log on the webpage
 @server.route('/api')
 def api_data():
     if(flask.request.authorization):
