@@ -17,7 +17,7 @@ import random
 import atexit
 import traceback
 import json
-
+from pryno.telegram_bot import quan_bot as telegram_bot
 
 # Used for reloading the bot - saves modified times of key files
 watched_files_mtimes = [(f, getmtime(f)) for f in settings.WATCHED_FILES]
@@ -33,7 +33,10 @@ class PPS:
         self.logger = logger.setup_logbook(name="pps")
         self.logger.info("Pryno is starting.")
         self.SLEEP_TELEGRAM = settings.SLEEP_TELEGRAM
-
+        #Also insert your created bot token on the quan_bot file in TOKEN_INFO)
+        # To understand better how to use the telegram bot just access the link below:
+            # https://www.codementor.io/@karandeepbatra/part-1-how-to-create-a-telegram-bot-in-python-in-under-10-minutes-19yfdv4wrq
+        # telegram_bot.send_group_message(msg="❗ Example to use telegram messages",chat_id= YOUR_CHAT_ID)
         # Setup loggers
         self.status_logger = logger.setup_dictlogger('status')
         self.wallet_logger = logger.setup_db('wallet')
@@ -207,7 +210,6 @@ class PPS:
         except FileNotFoundError:
             start_date = datetime.datetime.now()
             weeklyProfit = start_date + datetime.timedelta(days=7)
-            #wallet = self.exchange.get_funds()
             profit_data = {
                 'timestamp': str(start_date),
                 'initialBalance': self.wallet_amount,
@@ -219,8 +221,6 @@ class PPS:
 
             with open(profit_file_path,'w') as f:
                 json.dump(profit_data, f)
-
-        #If profit check callback fails notify through email
         except: 
             print('Some weird error at Profit check {0} '.format(traceback.format_exc()))
 
@@ -324,12 +324,8 @@ class PPS:
                             if(self.volumeActual > 0 and self.actualPrice > 0):
                                 self.stopSet = 0
                                 self.totalContracts = 0
-                                if(settings.ISOLATED_MARGIN_FACTOR > 1):
+                                if(settings.ISOLATED_MARGIN_FACTOR > 1 and settings.FIXED_MARGIN_FLAG):
                                     self._contractStep = round(settings.ISOLATED_MARGIN_FACTOR*settings.CONTRACT_PCT*self.actualPrice*tools.XBt_to_XBT(self.available_margin['availableMargin']))/settings.RISK_DIVISOR
-                                    #Specific setup for Mac-10 testing
-                                    if(settings.CLIENT_NAME == 'Tonho'):
-                                        if(self._contractStep < 25):
-                                            self._contractStep = 40
                                 else:
                                     self._contractStep = round(settings.CONTRACT_PCT*self.actualPrice*tools.XBt_to_XBT(self.available_margin['availableMargin']))/settings.RISK_DIVISOR
                                 lastPrice = tools.toNearest(self.actualPrice, self.tickSize)
@@ -602,8 +598,6 @@ class PPS:
             #Notify if High Step Order executed
             if(settings._HIGH_STEP_ORDER):
                 self.logger.info("High step order executed, alerting bot masters")
-                mailMessage = "⚠️ High step order executed for {0}. Step: {1}. Price: {2}.".format(
-                                    settings.CLIENT_NAME,self.step_number,self.botHighStepInfo.get('price',None))
                 settings._HIGH_STEP_ORDER = False
 
             #Notify if client been stopped
@@ -615,7 +609,7 @@ class PPS:
                     initial_balance = checking_alterations['initialBalance']
 
                 loss = (self.available_margin['walletBalance'] - initial_balance)/initial_balance
-                mailMessage = str("Stop order executed for {} couldnt detect the further stop info".format(settings.CLIENT_NAME))
+        
                 if(self.botStopInfo != ''):
                     self.logger.info('Bot stopped, check log')
                 else:

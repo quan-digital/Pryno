@@ -12,7 +12,7 @@ except:
 	from pryno.config import configure
 	configure.create_settings(base_path='config/settings_base.py', config_path='config/config.json' , out_path = 'util/settings.py')
 	from pryno.util import settings
-	settings.VALID_USERNAME_PASSWORD_PAIRS.update({settings.CLIENT_NAME: settings.CLIENT_PWD})
+	# settings.VALID_USERNAME_PASSWORD_PAIRS.update({settings.CLIENT_NAME: settings.CLIENT_PWD})
 
 from pryno.config import configure
 from pryno.util import tools, logger
@@ -55,7 +55,6 @@ if __name__ == '__main__':
 		tools.create_dirs()
 		# Build new settings to handle updates
 		configure.create_settings(base_path='config/settings_base.py', config_path='config/config.json', out_path='util/settings.py')
-		settings.VALID_USERNAME_PASSWORD_PAIRS.update({settings.CLIENT_NAME: settings.CLIENT_PWD})
 		settings.STM_INDICATOR_INIT = len(settings.BOT_NAME) + len(settings.BOT_VERSION) + 2
 		settings.GRADLE_INDICATOR_INIT = len(settings.BOT_NAME) + len(settings.BOT_VERSION) + 2
 		settings.STM_INDICATOR_END = len(settings.STM_INDICATOR)+ len(settings.BOT_NAME) + len(settings.BOT_VERSION)+1
