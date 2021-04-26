@@ -248,7 +248,9 @@ If you already tested the application and created a cloud server instance to lea
     
 Also refer to this link it will help you detach your terminal screen and leave the code running well even after you logout from your server:
 
-[https://arnab-k.medium.com/how-to-keep-processes-running-after-ending-ssh-session-c836010b26a3](keep processes after ending ssh session)
+
+[keep processes after ending ssh session](https://arnab-k.medium.com/how-to-keep-processes-running-after-ending-ssh-session-c836010b26a3)
+
 
 
 You can leave it long running at your computer, we tested running this bot on aws with a ec2 t2.micro free tier instance and it was more then enough
