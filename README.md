@@ -3,6 +3,40 @@ The ultimate crypto bot dev package - Trading Infrastructure + Dashboard + Teleg
 
 <img src="img/cover.jpg" align="center" />
 
+
+
+## Quick Start
+
+You can quick start using the bot by creating the json and them running the code below:
+
+```shell
+touch config.json
+```
+Specify this file like the example below:
+
+```JSON
+{
+	"CLIENT_NAME" : "YOUR_ACCOUNT_NAME",
+	"CLIENT_PWD" : "ANY_TEXT",
+	"BITMEX_KEY" : "YOUR_TESTENET_API_KEY",
+	"BITMEX_SECRET" : "YOUR_TESTENET_API_SECRET",
+	"FIXED_STEP" : 500,
+	"ISOLATED_MARGIN_FACTOR": 5,
+	"CONTRACT_PCT": 0.1075,
+	"TOTAL_STEP": 5,
+	"FIXED_MARGIN_FLAG": false,
+	"SEND_EMAIL_GRADLE": 3,
+	"MIN_FUNDS": 10000,
+	"BASE_URL" : "https://testnet.bitmex.com/api/v1/"		
+}
+```
+
+```shell
+git clone https://github.com/quan-digital/Pryno.git && cp config.json Pryno/pryno/config && cd Pryno  &&  python3 -m venv venv && source venv/bin/activate && cd ../ && pip3 install -e Pryno && cd ./Pryno/pryno && python3 main.py
+```
+
+
+
 ## Overview
 
 This is an automated trading strategy specially design to work with future contracts of the pair BTC/USD from Bitmex exchange, it is a refinement from the one exposed at https://github.com/BitMEX/sample-market-maker. It was used for real trading on Bitmex from December 2019 to may 2020. Any pull request or improvement proposal will be analysed by the strategy authors.
@@ -33,7 +67,6 @@ The market conditions to enable the bot to run where all based on bitcoin market
 The user understands and agree that past results are not necessarily indicative of future performance.
 
 
-## Configurable parameters
 ## User Guide Instalation
 
 Before starting, if you are running this bot in a Windows system be aware to change to the proper commands.
@@ -85,37 +118,35 @@ Then run the following steps:
 
 2. Copy the `config.json` file to the folder `./Pryno/pryno/config`
 
-3. Create a new branch:
 
-    ```shell
-    git checkout -b develop-test
-    ```
-
-4. Start a python virtual environment with [venv](https://docs.python.org/pt-br/3/library/venv.html):
+3. Start a python virtual environment with [venv](https://docs.python.org/pt-br/3/library/venv.html):
 
     ```shell
     python3 -m venv venv 
     ```
 
-5. Activate the environment: 
+4. Activate the environment: 
 
     ```shell
     source venv/bin/activate
     ```
 
-6. Be sure you are outside `./Pryno` folder, then run:
+5. Be sure you are outside `./Pryno` folder, then run:
 
     ```shell
     cd ../ && pip3 install -e Pryno
     ```
 
-## Quick Start
+After those steps just follow usage to start the application in development mode
+## Usage
 
-Instead, you can execute the previous commands at once by running the code below:
+To build the application,  go to folder `./Pryno/pryno` and execute `main.py` file:
 
-```shell
-git clone https://github.com/quan-digital/Pryno.git && cp config.json Pryno/pryno/config && cd Pryno  && git checkout -b develop-test && python3 -m venv venv && source venv/bin/activate && cd ../ && pip3 install -e Pryno && cd ./Pryno/pryno
-```
+    ``` shell
+    python3 main.py
+    ```
+
+Now, you can see the application running in your terminal, and the dashboard is running on [http://127.0.0.1:80](http://127.0.0.1:80)
 
 
 ## Advanced configurable parameters
@@ -140,13 +171,13 @@ You can tune your bot by configuring some specific operations paramaters as the 
 
 
 
-*CONTRACT_PCT= the percentage amount of your available funds that will be used in each order of the gradle
+* CONTRACT_PCT= the percentage amount of your available funds that will be used in each order of the gradle
 
 
 
 
 
-*TOTAL_STEP = the amount of open orders in each gradle side(LONG and SHORT)
+* TOTAL_STEP = the amount of open orders in each gradle side(LONG and SHORT)
 
 
 
@@ -180,18 +211,6 @@ You can tune your bot by configuring some specific operations paramaters as the 
 
 
 To check all the possible settings go to settings_base.py and check the comments in the code
-
-## Usage
-
-To build the application,  go to folder `./Pryno/pryno` and execute `main.py` file:
-
-    ``` shell
-    cd ./Pryno/pryno && python3 main.py
-    ```
-
-Now, you can see the application running in your terminal, and the dashboard is running on [http://127.0.0.1:80](http://127.0.0.1:80)
-
-
 
 ## Working Example
 
