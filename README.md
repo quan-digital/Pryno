@@ -121,62 +121,62 @@ git clone https://github.com/quan-digital/Pryno.git && cp config.json Pryno/pryn
 ## Advanced configurable parameters
 
 You can tune your bot by configuring some specific operations paramaters as the one's listed below:
-```JSON
-FIXED_STEP = the step in dollars between each open order in the gradle
+```
+* FIXED_STEP = the step in dollars between each open order in the gradle
 
 
 
 
 
-FIXED_MARGIN_FLAG = is set to true you will be working with isolated margin if it is false you will use cross margin (for better understatement: https://www.bitmex.com/app/isolatedMargin)
+* FIXED_MARGIN_FLAG = is set to true you will be working with isolated margin if it is false you will use cross margin (for better understatement: https://www.bitmex.com/app/isolatedMargin)
 
 
 
 
 
-ISOLATED_MARGIN_FACTOR = the amount of leverage that is possible for your account, if only works in the code if FIXED_MARGIN_FLAG is true
+* ISOLATED_MARGIN_FACTOR = the amount of leverage that is possible for your account, if only works in the code if FIXED_MARGIN_FLAG is true
 
 
 
 
 
-CONTRACT_PCT= the percentage amount of your available funds that will be used in each order of the gradle
+*CONTRACT_PCT= the percentage amount of your available funds that will be used in each order of the gradle
 
 
 
 
 
-TOTAL_STEP = the amount of open orders in each gradle side(LONG and SHORT)
+*TOTAL_STEP = the amount of open orders in each gradle side(LONG and SHORT)
 
 
 
-SEND_EMAIL_GRADLE  = this feature was used to shot email messages for the clients using the bot, since we are publishing it open source we removed the personal emails being used before but feel free to config a server email and other address to send messages.
+* SEND_EMAIL_GRADLE  = this feature was used to shot email messages for the clients using the bot, since we are publishing it open source we removed the personal emails being used before but feel free to config a server email and other address to send messages.
 
 
 
-MIN_FUNDS = the minimum amount of satoshis for the bot to run
+* MIN_FUNDS = the minimum amount of satoshis for the bot to run
 
 
 
-PROFIT_TARGET = the exit order amount of profit in dollars, by default set to 2
+* PROFIT_TARGET = the exit order amount of profit in dollars, by default set to 2
 
 
 
-ENABLE_VOLUMAMP = if equals to zero the bot won't check the security parameters and will operate all the time if turned on, if equal to 1 the bot will work with the security parameters
+* ENABLE_VOLUMAMP = if equals to zero the bot won't check the security parameters and will operate all the time if turned on, if equal to 1 the bot will work with the security parameters
 
 
 
-MIN_DM = minimun dollar minute to run (to understand better check the operations_parameters definition)
+* MIN_DM = minimun dollar minute to run (to understand better check the operations_parameters definition)
 
 
 
-MIN_DM_CANCEL = minimun dollar minute to cancel open gradle
+* MIN_DM_CANCEL = minimun dollar minute to cancel open gradle
 
 
 
 
 
-MAX_VOLUME = maximun average volume in which the bot works
+* MAX_VOLUME = maximun average volume in which the bot works
 
 ```
 
