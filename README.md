@@ -31,7 +31,10 @@ Tons of awesome Github Actions integrated. Autopep, Intellicode
 Wallpaper art found [here](http://www.wallpaperswebs.com/rhino-art/).
 The market conditions to enable the bot to run where all based on bitcoin market by December 2020, a good tuning of these parameters is necessary for good results.
 The user understands and agree that past results are not necessarily indicative of future performance.
-# User Guide Instalation
+
+
+## Configurable parameters
+## User Guide Instalation
 
 Before starting, if you are running this bot in a Windows system be aware to change to the proper commands.
 
@@ -49,72 +52,7 @@ There are 3 configuration examples with different strategy settings in the confi
 
 The config.json file will be written with settings_base.py and then create the settings.py file on the bot startup (all the parameters in setting.py are configurable)
 
-The example below just configures the most important ones:
-
-
-
-
-
-FIXED_STEP = the step in dollars between each open order in the gradle
-
-
-
-
-
-FIXED_MARGIN_FLAG = is set to true you will be working with isolated margin if it is false you will use cross margin (for better understatement: https://www.bitmex.com/app/isolatedMargin)
-
-
-
-
-
-ISOLATED_MARGIN_FACTOR = the amount of leverage that is possible for your account, if only works in the code if FIXED_MARGIN_FLAG is true
-
-
-
-
-
-CONTRACT_PCT= the percentage amount of your available funds that will be used in each order of the gradle
-
-
-
-
-
-TOTAL_STEP = the amount of open orders in each gradle side(LONG and SHORT)
-
-
-
-SEND_EMAIL_GRADLE  = this feature was used to shot email messages for the clients using the bot, since we are publishing it open source we removed the personal emails being used before but feel free to config a server email and other address to send messages.
-
-
-
-MIN_FUNDS = the minimum amount of satoshis for the bot to run
-
-
-
-PROFIT_TARGET = the exit order amount of profit in dollars, by default set to 2
-
-
-
-ENABLE_VOLUMAMP = if equals to zero the bot won't check the security parameters and will operate all the time if turned on, if equal to 1 the bot will work with the security parameters
-
-
-
-MIN_DM = minimun dollar minute to run (to understand better check the operations_parameters definition)
-
-
-
-MIN_DM_CANCEL = minimun dollar minute to cancel open gradle
-
-
-
-
-
-MAX_VOLUME = maximun average volume in which the bot works
-
-
-
-To check all the possible settings go to settings_base.py and check the comments in the code
-
+The example below just configures the most important ones needed to start the bot:
 
 ```shell
 touch config.json
@@ -179,6 +117,71 @@ Instead, you can execute the previous commands at once by running the code below
 git clone https://github.com/quan-digital/Pryno.git && cp config.json Pryno/pryno/config && cd Pryno  && git checkout -b develop-test && python3 -m venv venv && source venv/bin/activate && cd ../ && pip3 install -e Pryno && cd ./Pryno/pryno
 ```
 
+
+## Advanced configurable parameters
+
+You can tune your bot by configuring some specific operations paramaters as the one's listed below:
+```JSON
+FIXED_STEP = the step in dollars between each open order in the gradle
+
+
+
+
+
+FIXED_MARGIN_FLAG = is set to true you will be working with isolated margin if it is false you will use cross margin (for better understatement: https://www.bitmex.com/app/isolatedMargin)
+
+
+
+
+
+ISOLATED_MARGIN_FACTOR = the amount of leverage that is possible for your account, if only works in the code if FIXED_MARGIN_FLAG is true
+
+
+
+
+
+CONTRACT_PCT= the percentage amount of your available funds that will be used in each order of the gradle
+
+
+
+
+
+TOTAL_STEP = the amount of open orders in each gradle side(LONG and SHORT)
+
+
+
+SEND_EMAIL_GRADLE  = this feature was used to shot email messages for the clients using the bot, since we are publishing it open source we removed the personal emails being used before but feel free to config a server email and other address to send messages.
+
+
+
+MIN_FUNDS = the minimum amount of satoshis for the bot to run
+
+
+
+PROFIT_TARGET = the exit order amount of profit in dollars, by default set to 2
+
+
+
+ENABLE_VOLUMAMP = if equals to zero the bot won't check the security parameters and will operate all the time if turned on, if equal to 1 the bot will work with the security parameters
+
+
+
+MIN_DM = minimun dollar minute to run (to understand better check the operations_parameters definition)
+
+
+
+MIN_DM_CANCEL = minimun dollar minute to cancel open gradle
+
+
+
+
+
+MAX_VOLUME = maximun average volume in which the bot works
+
+```
+
+To check all the possible settings go to settings_base.py and check the comments in the code
+
 ## Usage
 
 To build the application,  go to folder `./Pryno/pryno` and execute `main.py` file:
@@ -193,8 +196,11 @@ Now, you can see the application running in your terminal, and the dashboard is 
 
 ## Working Example
 
-This is how your should look like after you are running the application:
+This is how the dashboard should look like after you are running the application:
 <img src="img/plataform1.png" align="center" />
+<br/>
+<br/>
+<br/>
 <img src="img/plataform2.png" align="center" />
 
 
