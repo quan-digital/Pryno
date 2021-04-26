@@ -194,13 +194,13 @@ Now, you can see the application running in your terminal, and the dashboard is 
 ## Working Example
 
 This is how your should look like after you are running the application:
-<img src="img/plataform1.jpg" align="center" />
-<img src="img/plataform2.jpg" align="center" />
+<img src="img/plataform1.png" align="center" />
+<img src="img/plataform2.png" align="center" />
 
 
 You can check informations about the states in the terminal session and also on bitmex as showed below:
 
-<img src="img/bitmex.jpg" align="center" />
+<img src="img/bitmex.png" align="center" />
 
 ## LongTime Usage
 
