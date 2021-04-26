@@ -46,13 +46,25 @@ For trying it as a user and just configuring and adapting the current working st
 
 ## The implemented strategy
 PPS strategy has the goal to do profits on the daily fluctuation of bitcoin price to the dollar so first the bot do some technical analysis to check if the market is secure (by the amount of volume in the last hour, check lock anomaly and volume amp on the code), the bot only operates in conditions evaluated as safe, if it's secure it open a bulk of orders to both buy and sell sides and wait for the price variation to execute one of them.
-After the first order of a given side is taken the bot reposition itself leaving only the gradle (gradle is a term to define a bulk of orders with different price cascaded on a side —  a bulk of orders like those: BTC/USD@99700 BTC/USD@99800 BTC/USD@99900 ... would be a buy gradle) of that side with open order and sets an exit profit order in a user configured amount and a stop order one level above the last open order of the gradle. The bot goes repositioning the exit order as another gradle orders are taken.
+
+
+After the first order of a given side is taken the bot reposition itself leaving only the gradle (gradle is a term to define a bulk of orders with different price cascaded on a side —  a bulk of orders like those: BTC/USD@99700 BTC/USD@99800 BTC/USD@99900 ... would be a buy gradle) of that side with open order and sets an exit profit order in a user configured amount and a stop order one level above the last open order of the gradle. 
+
+The bot goes repositioning the exit order as another gradle orders are taken.
+
+
 The main usage of this strategy is for getting multiple small profits through the day over the price fluctuation by the small exit targets and the rebate paid by bitmex for creating maker orders(https://www.bitmex.com/app/fees). In a good day there would be more or less 20 to 30 operations.
+
+
 For understanding it in the code, the run_loop (the method is defined inside pps file) is the main loop inside of it is possible to check the three states for the bot(also methods defined in the pps file):
 
 
-Post_gradle_orders — initial state, check security parameters and post the gradle orders.
+post_gradle_orders — initial state, check security parameters and post the gradle orders.
+
+
 position_loop('Buy') — define the stop an exit orders for the long side, reposition the exit orders as another gradle order is taken.
+
+
 position_loop('Sell') — define the stop an exit orders for the short side, reposition the exit orders as another gradle order is taken.
 
 
