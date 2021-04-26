@@ -121,7 +121,7 @@ git clone https://github.com/quan-digital/Pryno.git && cp config.json Pryno/pryn
 ## Advanced configurable parameters
 
 You can tune your bot by configuring some specific operations paramaters as the one's listed below:
-```
+
 * FIXED_STEP = the step in dollars between each open order in the gradle
 
 
@@ -178,7 +178,6 @@ You can tune your bot by configuring some specific operations paramaters as the 
 
 * MAX_VOLUME = maximun average volume in which the bot works
 
-```
 
 To check all the possible settings go to settings_base.py and check the comments in the code
 
