@@ -18,7 +18,8 @@ import os
 from pryno.dashboard import app
 from pryno.util import tools
 
-
+# Call this function to leave the bot proccess running without stopping passing as argument main.py
+#
 if __name__ == "__main__":
     tools.create_dirs()
     filename = sys.argv[1]

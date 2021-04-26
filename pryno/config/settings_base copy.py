@@ -171,9 +171,3 @@ GRADLE_NUMBER = 0
 # BOT_MAIL = "your_email@gmail.com"
 # BOT_PWD = "email_password"
 
-MAIL_TO_ERROR = 'default mail adress to send in problem case'
-
-#####################################################
-# Overrided paramaters from config.json
-#####################################################
-

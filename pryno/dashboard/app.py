@@ -20,14 +20,14 @@ import schedule
 import requests
 import logging
 import flask
-from flask_login import user_logged_in
+# from flask_login import user_logged_in
 from flask import Flask, request
 import dash
 from dash.dependencies import Input, Output, State
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
-import dash_auth
+# import dash_auth
 from pryno.util import settings, tools
 from pryno.dashboard import client_dash
 import time
@@ -50,10 +50,7 @@ HOST = '0.0.0.0'
 
 # Creating webapp
 app = dash.Dash(__name__)
-auth = dash_auth.BasicAuth(
-    app,
-    settings.VALID_USERNAME_PASSWORD_PAIRS
-)
+
 server = app.server
 
 # Datetime update
@@ -294,33 +291,6 @@ def make_btc_figure(n):
     return figure
 
 
-@app.callback(dash.dependencies.Output('pause_message', 'children'),
-              [dash.dependencies.Input('pause_button', 'n_clicks'),
-              dash.dependencies.Input('pause_confirm', 'cancel_n_clicks_timestamp'),
-              dash.dependencies.Input('pause_confirm', 'submit_n_clicks_timestamp')])
-def update_output(n_clicks, cancel_n_clicks_timestamp, submit_n_clicks_timestamp):
-    '''Bot operation button handling.'''
-    username = flask.request.authorization['username']
-    if not(cancel_n_clicks_timestamp):
-        cancel_n_clicks_timestamp = 1
-    if not(submit_n_clicks_timestamp):
-        submit_n_clicks_timestamp = 1
-    if n_clicks:
-        if username in settings.ADMIN_USERS:
-            if submit_n_clicks_timestamp > cancel_n_clicks_timestamp:
-                with open(settings.LOG_DIR + 'operation.json', 'w') as op:
-                    json.dump(dict(operation = True), op)
-                settings._PAUSE_BOT = False
-                return
-            else:
-                with open(settings.LOG_DIR + 'operation.json', 'w') as op:
-                    json.dump(dict(operation = False), op)
-                settings._PAUSE_BOT = True
-                return
-        else:
-            return
-    else:
-        return
 
 
 @app.callback([dash.dependencies.Output('html_p1', 'children'),
@@ -329,18 +299,18 @@ def update_output(n_clicks, cancel_n_clicks_timestamp, submit_n_clicks_timestamp
     dash.dependencies.Output('html_p4', 'children'),
     dash.dependencies.Output('html_p5', 'children')],
     [Input('interval-component', 'n_intervals')])
-def check_user_privilege(n):
+def Set_Debug_Mode(n):
     '''Check user admin level and render dashboard accordingly.'''
-    username = flask.request.authorization['username']
-    if username in settings.ADMIN_USERS:
-        settings.DEBUG_DASH = True
+    settings.DEBUG_DASH = True #change this accordingly with the information you desire to see on Dashboard
+    # if Debug is false you see another set of information at user screen
+    if settings.DEBUG_DASH:
         html_p1 = 'Volume'
         html_p2 = 'Amplitude'
         html_p3 = 'Dollar Minute'
         html_p4 = 'Lock Anomaly'
         html_p5 = 'Errors'
     else:
-        settings.DEBUG_DASH = False
+
         html_p1 = 'Funding'
         html_p2 = 'Leverage'
         html_p3 = 'Avg Entry'
@@ -349,16 +319,7 @@ def check_user_privilege(n):
     return [html_p1, html_p2, html_p3, html_p4, html_p5]
 
 
-@app.callback([dash.dependencies.Output('button_name','children')],
-              [Input('interval-component', 'n_intervals')])
-def check_button_user(n):
-    '''Check user admin level and render run button accordingly.'''
-    username = flask.request.authorization['username']
-    if username in settings.ADMIN_USERS:
-        bn = 'Run Bot'
-    else:
-        bn = 'In development'
-    return [bn]
+
 
 # -----------------------------------------------------------------------------------------
 # ----------------------- Server Functions ------------------------------------------------
@@ -367,7 +328,20 @@ def check_button_user(n):
 
 
 def run_server():
-    print("Dashboard app server started running.")
+    print(f"""
+    
+    Dashboard app server started running!
+
+    _____________________________________________________ 
+                                                      
+            Access URL:                                
+            -------------------------------            
+            Localhost: http://127.0.0.1:{PORT}             
+                                                      
+    _____________________________________________________
+
+    
+    """)
     pid = os.getpid()
     response = os.popen("ps -ef | grep python")
     print(response)
@@ -389,10 +363,13 @@ def shutdown():
     return 'Server shutting down...'
 
 
+
+#endpoint to reset bot process, if some server update or thing like that is sent
 @server.route('/reset', methods=['POST'])
 def process_json():
     input_json = flask.request.get_json()
-    if input_json.get('pwd') == 'kero10gostosasda19computacao':
+    # the pwd parameter is hardcoded for now
+    if input_json.get('pwd') == 'bot_Reset':
         r2 = Timer(4.0, shutdown_server)
         r1.start()
         r2.start()
@@ -401,6 +378,8 @@ def process_json():
         return 'Wrong credentials', 400
 
 
+
+# the below routes are for checkin applications log on the webpage
 @server.route('/api')
 def api_data():
     if(flask.request.authorization):

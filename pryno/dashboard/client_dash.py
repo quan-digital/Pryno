@@ -52,27 +52,6 @@ clients_dash = html.Div(
 
                     className='eight columns'
                 ),
-                dcc.ConfirmDialogProvider(
-                    children=html.A(
-                    html.Button(
-                        html.H5(
-
-                            id = 'button_name',
-                            className="info_text",
-                            style={'padding-left':'0px',
-                                    'font-size': '1.0rem'}
-                        ),
-                        id="pause_button"
-                    ),
-                    className="two columns"
-                    
-                ),
-                    message="Press 'OK' to run bot, and 'Cancel' to pause operation",
-                    id='pause_confirm'
-                    ),
-                html.Div(id='pause_message',
-                    children= "",
-                    style={'text-align': 'center'}),
                 html.Img(
                     src="assets/logo-light.png",
                     className='two columns',

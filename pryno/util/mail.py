@@ -28,10 +28,11 @@ def send_email(message,destination=settings.MAIL_TO_ERROR):
     server.quit()
 
 if __name__ == '__main__':
+    # simple thest to verify mail feature working
     msg = EmailMessage()
-    msg["From"] = "pipryno@gmail.com"
+    msg["From"] = "your_email@gmail.com"
     msg["Subject"] = "Pryno Exception for {0}".format(settings.CLIENT_NAME)
-    msg["To"] = settings.MAIL_TO_ERROR
+    msg["To"] = settings.MAIL_TO_ERROR 
     msg.set_content("Exception occured, processRunner had to restart '%s' bot. \n \
 Please check the following error log, master." % settings.CLIENT_NAME)
     error_path = settings.LOG_DIR + 'errors_' + str(dt.datetime.today().strftime('%Y-%m-%d')) + '.txt'

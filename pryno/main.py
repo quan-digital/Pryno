@@ -12,7 +12,7 @@ except:
 	from pryno.config import configure
 	configure.create_settings(base_path='config/settings_base.py', config_path='config/config.json' , out_path = 'util/settings.py')
 	from pryno.util import settings
-	settings.VALID_USERNAME_PASSWORD_PAIRS.update({settings.CLIENT_NAME: settings.CLIENT_PWD})
+	# settings.VALID_USERNAME_PASSWORD_PAIRS.update({settings.CLIENT_NAME: settings.CLIENT_PWD})
 
 from pryno.config import configure
 from pryno.util import tools, logger
@@ -29,6 +29,7 @@ def build_bot():
 		return False
 
 
+#Test to call if you want only run the strategy
 def build_mm():
 	try:
 		mm = pps.PPS()
@@ -37,6 +38,7 @@ def build_mm():
 		return False
 
 
+#Test to call if you want only build server alone
 def build_app():
 	try:
 		Thread(target=app.run_server).start()
@@ -45,13 +47,14 @@ def build_app():
 		return False
 
 
+
+#Main test to check strategy + dashboard running
 if __name__ == '__main__':
 	try:
 		logger.setup_logger()
 		tools.create_dirs()
 		# Build new settings to handle updates
 		configure.create_settings(base_path='config/settings_base.py', config_path='config/config.json', out_path='util/settings.py')
-		settings.VALID_USERNAME_PASSWORD_PAIRS.update({settings.CLIENT_NAME: settings.CLIENT_PWD})
 		settings.STM_INDICATOR_INIT = len(settings.BOT_NAME) + len(settings.BOT_VERSION) + 2
 		settings.GRADLE_INDICATOR_INIT = len(settings.BOT_NAME) + len(settings.BOT_VERSION) + 2
 		settings.STM_INDICATOR_END = len(settings.STM_INDICATOR)+ len(settings.BOT_NAME) + len(settings.BOT_VERSION)+1
@@ -62,7 +65,8 @@ if __name__ == '__main__':
 		with open('pids/bot.pid', 'w') as w:
 			w.write(str(pid))
 		mm = pps.PPS(settings.BASE_URL)
-		# Thread(target=app.run_server).start()
+		start_dashboard_server = True
+		Thread(target=app.run_server).start() if start_dashboard_server else False
 		mm.run_loop()
 	except (KeyboardInterrupt, SystemExit):
 		# mm.exchange.cancel_every_order()
