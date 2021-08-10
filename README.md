@@ -157,7 +157,7 @@ After those steps just follow usage to start the application in development mode
 
 To build the application,  go to folder `./Pryno/pryno` and execute `main.py` file:
 
-    ``` shell
+    ```shell
     python3 main.py
     ```
 
